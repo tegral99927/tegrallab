@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoVoice - Robot Voice Changer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
+    <!-- Import lamejs for MP3 encoding -->
+    <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>RoVoice <span class="subtitle">Cyber Polyphonic Unit</span></h1>
+            <div class="status-panel">
+                <span id="status-text">システムスタンバイ</span>
+                <div class="pulse-indicator"></div>
+            </div>
+        </header>
+
+        <main>
+            <!-- Visualizer Section -->
+            <section class="visualizer-container">
+                <canvas id="waveform-canvas"></canvas>
+            </section>
+
+            <!-- Controls Section -->
+            <section class="controls-container">
+                <!-- Source Selection -->
+                <div class="control-group source-panel">
+                    <h2>入力ソース (DATA SOURCE)</h2>
+                    <div class="tab-controls">
+                        <button id="tab-mic" class="cyber-btn sm active">マイク入力 (MIC)</button>
+                        <button id="tab-file" class="cyber-btn sm">ファイル読込 (FILE)</button>
+                    </div>
+
+                    <div id="file-input-container" class="hidden">
+                        <input type="file" id="audio-upload" accept="audio/*">
+                        <label for="audio-upload" class="cyber-btn file-trigger">ファイルを選択</label>
+                        <span id="file-name-display">未選択</span>
+                        <p style="font-size:0.8rem; color:#00f3ff; margin-top:5px;">※読込後、下の「ロボ声で保存」ですぐに変換できます</p>
+                    </div>
+
+                    <div id="file-playback-controls" class="hidden" style="flex-wrap: wrap; justify-content: center;">
+                        <button id="file-play-raw-btn" class="cyber-btn warning sm">原音 再生</button>
+                        <button id="file-play-robot-btn" class="cyber-btn success sm">ロボ 再生</button>
+                        <button id="file-stop-btn" class="cyber-btn danger sm" disabled>停止</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h2>変調設定 (MODULATION)</h2>
+
+                    <div class="slider-wrapper">
+                        <label for="pitch-slider">ロボットピッチ (周波数)</label>
+                        <input type="range" id="pitch-slider" min="50" max="2000" value="140" step="10">
+                        <span class="value-display" id="pitch-val">140 Hz</span>
+                    </div>
+
+                    <div class="slider-wrapper">
+                        <label for="depth-slider">変調の深さ (ロボット度)</label>
+                        <input type="range" id="depth-slider" min="0" max="1" value="0.6" step="0.05">
+                        <span class="value-display" id="depth-val">60%</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h2>歪み・ノイズ (DISTORTION)</h2>
+                    <div class="slider-wrapper">
+                        <label for="distortion-slider">ラフネス (歪み)</label>
+                        <input type="range" id="distortion-slider" min="0" max="100" value="5" step="1">
+                        <span class="value-display" id="distortion-val">5</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h2>エコー (ECHO)</h2>
+                    <div class="slider-wrapper">
+                        <label for="delay-slider">ディレイ時間</label>
+                        <input type="range" id="delay-slider" min="0" max="1" value="0.05" step="0.01">
+                        <span class="value-display" id="delay-val">0.05 s</span>
+                    </div>
+                    <div class="slider-wrapper">
+                        <label for="feedback-slider">フィードバック (残響)</label>
+                        <input type="range" id="feedback-slider" min="0" max="0.9" value="0.2" step="0.05">
+                        <span class="value-display" id="feedback-val">20%</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="actions-container">
+                <div class="io-controls">
+                    <button id="start-btn" class="cyber-btn primary">システム起動 / マイク接続</button>
+                    <div class="record-controls disabled" id="record-group">
+                        <button id="record-btn" class="cyber-btn danger">録音開始</button>
+                        <button id="stop-btn" class="cyber-btn warning" disabled>録音停止</button>
+                    </div>
+                </div>
+
+                <div class="export-controls disabled" id="export-group">
+                    <input type="text" id="filename-input" placeholder="ファイル名を入力" value="rovoice_recording">
+                    <div class="btn-group">
+                        <button id="save-btn" class="cyber-btn success">ロボ声で保存 (MP3)</button>
+                        <button id="save-raw-btn" class="cyber-btn warning">原音を保存 (MP3)</button>
+                    </div>
+                    <audio id="audio-preview" controls></audio>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>SYSTEM: <span class="blink">ANTIGRAVITY</span> // TECH: WEB AUDIO API + LAMEJS</p>
+            <p class="copyright">©てぐらる(元INてぐらる)</p>
+        </footer>
+    </div>
+
+    <!-- Support Modal moved outside container to fix positioning context -->
+    <div id="support-modal" class="modal hidden">
+        <div class="modal-content">
+            <p>保存、ありがとうございます。<br>よかったら支援をお願いします。</p>
+            <div class="modal-actions">
+                <a href="https://tegrals-laboratory.booth.pm/items/6532465" target="_blank"
+                    class="cyber-btn primary">応援する / ローカル版を手に入れる</a>
+                <button id="close-modal-btn" class="cyber-btn danger sm">閉じる</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
