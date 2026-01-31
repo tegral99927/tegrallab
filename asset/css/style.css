@@ -341,3 +341,104 @@ body {
         transition-delay: 0.3s;
     }
 }
+
+/* Common Footer Styles */
+.common-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    /* Handle full viewport width */
+    max-width: 100%;
+    /* Prevent overflow */
+    box-sizing: border-box;
+    /* Include padding in width */
+    padding: 1.5rem 1rem;
+    /* Reduce horizontal padding */
+    text-align: center;
+    background: linear-gradient(to top, rgba(13, 13, 18, 0.9) 0%, rgba(13, 13, 18, 0) 100%);
+    z-index: 100;
+    pointer-events: none;
+    /* Let clicks pass through transparent parts */
+}
+
+.common-footer .footer-links,
+.common-footer .copyright {
+    pointer-events: auto;
+    /* Re-enable clicks for content */
+    max-width: 100%;
+    /* Ensure content doesn't overflow */
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    /* Reduce gap */
+    margin-bottom: 0.8rem;
+    flex-wrap: wrap;
+    /* Allow wrapping on small screens */
+    width: 100%;
+}
+
+.footer-btn {
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    /* More compact buttons */
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    white-space: nowrap;
+    /* Prevent text breaking awkwardly */
+}
+
+.support-btn {
+    background: rgba(255, 0, 255, 0.1);
+    color: #ffccff;
+    border-color: rgba(255, 0, 255, 0.3);
+}
+
+.support-btn:hover {
+    background: rgba(255, 0, 255, 0.2);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+}
+
+.footer-btn.back-btn {
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--accent-color);
+    border-color: rgba(0, 240, 255, 0.3);
+}
+
+.footer-btn.back-btn:hover {
+    background: rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+}
+
+.copyright {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: var(--font-main);
+    padding: 0 1rem;
+}
+
+@media (max-width: 768px) {
+    .common-footer {
+        padding: 1rem 0.5rem;
+        background: rgba(13, 13, 18, 0.85);
+        /* Solid background on mobile */
+        backdrop-filter: blur(10px);
+    }
+
+    .footer-links {
+        gap: 0.8rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .footer-btn {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.8rem;
+    }
+}
