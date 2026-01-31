@@ -691,3 +691,43 @@ footer {
         }
     }
 }
+
+/* Back Button */
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    text-decoration: none;
+    background: rgba(0, 5, 10, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .back-btn {
+        top: 15px;
+        left: 15px;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        border-radius: 50%;
+        min-width: unset;
+    }
+
+    .back-btn .btn-text {
+        display: none;
+    }
+
+    .back-btn .btn-icon {
+        font-size: 1.2rem;
+        margin-right: 0;
+        transform: translateY(-1px);
+        /* Slight optical alignment */
+    }
+}
