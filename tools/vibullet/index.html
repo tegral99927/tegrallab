@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- Google Analytics -->
+    <script src="/asset/js/gtag.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vibullet - Vibe Coding Support Tool</title>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Back Button -->
+    <a href="/pages/tools.html" class="back-btn-fixed">
+        <span>← ツール一覧へ戻る</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <div>
+                <h1>vibullet <span class="subtitle">Cyber Spec Generator</span></h1>
+            </div>
+            <div class="btn-group">
+                <button class="cyber-btn" onclick="document.getElementById('file-input').click()">設定読込 (JSON)</button>
+                <button class="cyber-btn" onclick="exportJSON()">設定保存 (JSON)</button>
+                <button class="cyber-btn danger" onclick="resetData()">リセット</button>
+                <input type="file" id="file-input" class="hidden-file-input" accept=".json" onchange="importJSON(this)">
+            </div>
+        </header>
+
+        <main class="main-grid">
+            <!-- Left Column: Inputs -->
+            <div class="column">
+                <div class="column-header">
+                    <h2>Input System</h2>
+                </div>
+                <div class="scrollable-content">
+                    <div class="form-group">
+                        <label for="productName">プロダクト名 <span style="color:var(--alert-red)">*</span></label>
+                        <input type="text" id="productName" placeholder="例: Todo管理アプリ「DoneDone」" oninput="autoSave()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productOverview">プロダクト概要</label>
+                        <textarea id="productOverview" placeholder="どのようなアプリか、誰が使うのかなどを記述"
+                            oninput="autoSave()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="techStack">使用する技術・言語</label>
+                        <p class="help-text">1行につき1項目を入力 (Line Break = New Item)</p>
+                        <textarea id="techStack" class="list-input" placeholder="HTML&#13;&#10;CSS&#13;&#10;JavaScript"
+                            oninput="autoSave()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="features">機能リスト</label>
+                        <p class="help-text">1行につき1項目を入力 (Line Break = New Item)</p>
+                        <textarea id="features" class="list-input"
+                            placeholder="タスク追加機能&#13;&#10;タスク削除機能&#13;&#10;CSVエクスポート" oninput="autoSave()"></textarea>
+                    </div>
+
+                    <button class="cyber-btn primary large" onclick="generateSpec()">GENERATE SPEC // 仕様書生成</button>
+                </div>
+            </div>
+
+            <!-- Right Column: Output -->
+            <div class="column">
+                <div class="column-header">
+                    <h2>Output Data</h2>
+                    <div class="btn-group">
+                        <button class="cyber-btn primary" onclick="copyToClipboard()">COPY</button>
+                        <button class="cyber-btn" onclick="downloadFile('md')">.MD DL</button>
+                        <button class="cyber-btn" onclick="downloadFile('txt')">.TXT DL</button>
+                        <button class="cyber-btn" onclick="printPDF()">PRINT / PDF</button>
+                    </div>
+                </div>
+                <textarea id="preview-area" readonly placeholder=">> WAITING FOR DATA..."></textarea>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-links">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank"
+                    class="footer-btn support-btn">BOOTHで支援する</a>
+                <a href="https://discord.gg/b3Yk4wZhQG" target="_blank" class="footer-btn">Discord</a>
+            </div>
+            <p>SYSTEM: <span style="color:var(--primary-cyan)">VIBULLET</span> // DEVELOPED BY TEGRAL LAB</p>
+            <p class="copyright">©てぐらる(元INてぐらる)</p>
+        </footer>
+    </div>
+
+    <!-- Hidden div for printing -->
+    <div id="print-content"></div>
+
+    <!-- Toast notification -->
+    <div id="toast">ACTION COMPLETED</div>
+
+    <!-- Support Modal -->
+    <div id="support-modal" class="modal hidden">
+        <div class="modal-content">
+            <p>ご利用ありがとうございます。<br>このツールが役立ちましたら、<br>ぜひご支援をお願いします。</p>
+            <div class="modal-actions">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank" class="cyber-btn primary"
+                    style="width:100%">支援ページへ (BOOTH)</a>
+                <button id="close-modal-btn" class="cyber-btn danger" style="width:100%">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
