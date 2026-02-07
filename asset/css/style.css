@@ -509,8 +509,10 @@ body {
 .app-icon {
     width: 72px;
     height: 72px;
-    border-radius: 16px;
-    /* Smooth rounded corners like App Store */
+    border-radius: 12px;
+    /* Consistent smooth rounded corners */
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Ensure shape visibility for transparent icons */
     object-fit: cover;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease;
