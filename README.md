@@ -23,3 +23,13 @@ If you find these tools helpful, please consider supporting the development.
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Note on Assets:**
+The images, audio files, and character designs located in the `/games/fanworkassets` directory are NOT covered by the MIT License.
+These are secondary creations based on the guidelines of VTubers/Company.
+You may not redistribute or use these assets for commercial purposes.
+
+(アセットに関する注意:
+`/games/fanworkassets` ディレクトリにある画像、音声ファイル、およびキャラクターデザインは、MITライセンスの対象外です。
+これらは、VTuber/企業のガイドラインに基づいた二次創作です。
+これらのアセットを再配布したり、商用利用したりすることはできません。)
