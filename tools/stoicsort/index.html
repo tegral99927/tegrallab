@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- Google Analytics -->
+    <script src="/asset/js/gtag.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoicSort - Control What You Can</title>
+    <meta name="keywords" content="StoicSort, ストア派, タスク管理, メンタルヘルス, コントロールの二分法">
+    <meta name="description" content="StoicSortは、悩みやタスクを「コントロールできること」と「できないこと」に仕分け、集中すべきことにフォーカスするためのストア派哲学に基づいたツールです。">
+
+    <!-- OGP -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="StoicSort - Control What You Can">
+    <meta property="og:image" content="https://tegrallab.com/tools/stoicsort/ogp.png">
+    <meta property="og:url" content="https://tegrallab.com/tools/stoicsort/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://tegrallab.com/tools/stoicsort/ogp.png">
+
+    <!-- Icons -->
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Libraries -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/gif.js/dist/gif.js"></script>
+
+    <!-- Font Awesome for Icons (Optional but good for cyberpunk UI) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Back Button -->
+    <a href="/pages/tools.html" class="back-btn-fixed">
+        <span>← ツール一覧へ戻る</span>
+    </a>
+
+    <div class="container">
+        <header class="cyber-header">
+            <h1 class="glitch" data-text="StoicSort">StoicSort</h1>
+            <p class="subtitle">DICHOTOMY OF CONTROL // PROTOCOL ACTIVATED</p>
+        </header>
+
+        <main id="main-workspace">
+            <!-- Input Area -->
+            <section class="input-section">
+                <div class="terminal-input-wrapper">
+                    <span class="prompt">></span>
+                    <input type="text" id="thought-input" placeholder="悩み / タスク / 考え事..." autocomplete="off">
+                    <button id="add-btn" class="cyber-btn primary">登録 (REGISTER)</button>
+                </div>
+            </section>
+
+            <!-- Columns -->
+            <section class="columns-container">
+                <!-- Controllable Column -->
+                <div class="column controllable" id="col-controllable">
+                    <div class="column-header">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                        <h2>コントロールできる (UNDER CONTROL)</h2>
+                        <span class="count" id="count-controllable">0</span>
+                    </div>
+                    <div class="item-list" id="list-controllable">
+                        <!-- Items go here -->
+                    </div>
+                </div>
+
+                <!-- Uncontrollable Column -->
+                <div class="column uncontrollable" id="col-uncontrollable">
+                    <div class="column-header">
+                        <i class="fa-solid fa-ban"></i>
+                        <h2>コントロールできない (OUT OF CONTROL)</h2>
+                        <span class="count" id="count-uncontrollable">0</span>
+                    </div>
+                    <div class="item-list" id="list-uncontrollable">
+                        <!-- Items go here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Bar -->
+            <section class="action-bar">
+                <button id="finalize-btn" class="cyber-btn success large">最終決定 (FINAL DECISION)</button>
+            </section>
+        </main>
+
+        <!-- Result View (Hidden by default) -->
+        <div id="result-view" class="hidden">
+            <div class="result-content" id="export-target">
+                <h2 class="result-title">あなたがコントロールできること</h2>
+                <div class="result-list" id="result-list-container">
+                    <!-- Final list goes here -->
+                </div>
+                <div class="result-footer">
+                    <p>StoicSort // FOCUS ON WHAT MATTERS</p>
+                </div>
+            </div>
+
+            <div class="export-actions">
+                <button class="cyber-btn" onclick="exportImage('png')">画像保存(PNG)</button>
+                <button class="cyber-btn" onclick="exportImage('jpg')">画像保存(JPG)</button>
+                <button class="cyber-btn" onclick="exportPDF()">PDF保存</button>
+                <!-- <button class="cyber-btn warning" onclick="exportGIF()">EXPORT GIF</button> -->
+                <button class="cyber-btn danger" onclick="resetAll()">リセット (RESET)</button>
+            </div>
+        </div>
+
+        <footer>
+            <div class="footer-links">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank"
+                    class="footer-btn support-btn">BOOTHで支援する</a>
+                <a href="https://discord.gg/b3Yk4wZhQG" target="_blank" class="footer-btn">Discord</a>
+            </div>
+            <p>SYSTEM: <span style="color:var(--primary-cyan)">STOICSORT</span> // DEVELOPED BY TEGRAL LAB</p>
+            <p class="copyright">©てぐらる(元INてぐらる)</p>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <!-- Sorting Modal -->
+    <div id="sort-modal" class="modal hidden">
+        <div class="modal-content terminal-window">
+            <div class="modal-header">
+                <span>QUERY // CONDITION_CHECK</span>
+            </div>
+            <div class="modal-body">
+                <p class="query-text">それは100%自分でコントロールできることですか?<br><span style="font-size:0.8rem; opacity:0.7;">(Is this
+                        100% under your control?)</span></p>
+                <h3 id="current-item-text" class="highlight-text">Sample Text</h3>
+                <div class="modal-actions">
+                    <button id="btn-yes" class="cyber-btn success">はい / YES</button>
+                    <button id="btn-no" class="cyber-btn danger">いいえ / NO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Modal -->
+    <div id="support-modal" class="modal hidden">
+        <div class="modal-content">
+            <p>エクスポート完了。<br>このツールが役立ちましたら、<br>ぜひご支援をお願いします。</p>
+            <div class="modal-actions">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank" class="cyber-btn primary"
+                    style="width:100%">支援ページへ (BOOTH)</a>
+                <button id="close-support-btn" class="cyber-btn danger" style="width:100%">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
