@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <!-- Google Analytics -->
+    <script src="/asset/js/gtag.js"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EpiCheck - エピクロスの欲望診断</title>
+    <meta name="keywords" content="EpiCheck, エピクロス, 欲望, 診断, 哲学, サイバーパンク">
+    <meta name="description" content="EpiCheckは、あなたが抱く欲望の正体をエピクロスの3分類に合わせて診断するツールです。心をざわつかせる欲望の正体を見極めましょう。">
+
+    <!-- OGP -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="EpiCheck - エピクロスの欲望診断">
+    <meta property="og:description" content="あなたが抱く欲望の正体をエピクロスの3分類に合わせて診断するツールです。">
+    <meta property="og:image" content="https://tegrallab.com/tools/epicheck/ogp.png">
+    <meta property="og:url" content="https://tegrallab.com/tools/epicheck/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://tegrallab.com/tools/epicheck/ogp.png">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Back Button -->
+    <a href="/pages/tools.html" class="back-btn-fixed">
+        <span>← ツール一覧へ戻る</span>
+    </a>
+
+    <div class="container">
+        <header>
+            <h1 class="glitch" data-text="EpiCheck">EpiCheck</h1>
+            <p class="subtitle">EPICUREAN DESIRE DIAGNOSIS // PROTOCOL ACTIVATED</p>
+        </header>
+
+        <main id="main-workspace" class="terminal-window">
+            <!-- Screen 1: Opening -->
+            <section id="screen-opening" class="screen active">
+                <div class="terminal-content">
+                    <p class="typewriter">エピクロス:やあ、よく来たね。<br>君の心をざわつかせるその『欲望』の正体が何なのか、<br>少し立ち止まって一緒に見極めていこうか。</p>
+                </div>
+                <div class="action-area">
+                    <button class="cyber-btn primary start-btn" onclick="nextScreen('screen-thought')">スタート
+                        (START)</button>
+                </div>
+            </section>
+
+            <!-- Screen 2: Thought -->
+            <section id="screen-thought" class="screen hidden">
+                <div class="terminal-content">
+                    <p class="typewriter">今、あなたが心に抱いている『ある欲望』を<br>一つ思い浮かべてください。</p>
+                </div>
+                <div class="action-area">
+                    <button class="cyber-btn primary" onclick="nextScreen('screen-q1')">次へ (NEXT)</button>
+                </div>
+            </section>
+
+            <!-- Screen 3: Q1 -->
+            <section id="screen-q1" class="screen hidden">
+                <div class="terminal-content">
+                    <p>Q1.その欲望の裏には、『他人に認められたい・自慢したい』という気持ちや、『いくらあっても満足できない（名声や莫大な富など）』という際限のなさが潜んでいますか？</p>
+                </div>
+                <div class="action-area double-btn">
+                    <button class="cyber-btn success" onclick="answerQuestion(1, 100)">はい (YES)</button>
+                    <button class="cyber-btn danger" onclick="answerQuestion(1, 0)">いいえ (NO)</button>
+                </div>
+            </section>
+
+            <!-- Screen 4: Q2 -->
+            <section id="screen-q2" class="screen hidden">
+                <div class="terminal-content">
+                    <p>Q2.もしその欲望が満たされなかった場合、あなたは明確な『肉体的な苦痛』を感じたり、生命・健康の維持に支障をきたしますか？</p>
+                </div>
+                <div class="action-area double-btn">
+                    <button class="cyber-btn success" onclick="answerQuestion(2, 10)">はい (YES)</button>
+                    <button class="cyber-btn danger" onclick="answerQuestion(2, 0)">いいえ (NO)</button>
+                </div>
+            </section>
+
+            <!-- Screen 5: Q3 -->
+            <section id="screen-q3" class="screen hidden">
+                <div class="terminal-content">
+                    <p>Q3.その欲望は、苦痛を取り除くためというより、純粋に『今よりさらに快適で贅沢な体験（美食やふかふかのベッドなど）』を味わうためのものですか？</p>
+                </div>
+                <div class="action-area double-btn">
+                    <button class="cyber-btn success" onclick="answerQuestion(3, 1)">はい (YES)</button>
+                    <button class="cyber-btn danger" onclick="answerQuestion(3, 0)">いいえ (NO)</button>
+                </div>
+            </section>
+
+            <!-- Screen 6: Result -->
+            <section id="screen-result" class="screen hidden">
+                <div class="terminal-content">
+                    <h2 id="result-title" class="result-title"></h2>
+                    <p id="result-message" class="result-message"></p>
+                </div>
+                <div class="action-area">
+                    <button class="cyber-btn share-btn" onclick="shareResult()">診断をシェア (SHARE)</button>
+                    <button class="cyber-btn danger" onclick="resetTest()">もう一度 (RETRY)</button>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-links">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank"
+                    class="footer-btn support-btn">BOOTHで支援する</a>
+                <a href="https://discord.gg/b3Yk4wZhQG" target="_blank" class="footer-btn">Discord</a>
+            </div>
+            <p>SYSTEM: <span style="color:var(--primary-purple)">EPICHECK</span> // DEVELOPED BY TEGRAL LAB</p>
+            <p class="copyright">©てぐらる(元INてぐらる)</p>
+        </footer>
+    </div>
+
+    <!-- BOOTH Donation Modal -->
+    <div id="support-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 class="modal-title">DIAGNOSIS COMPLETE</h3>
+            <p>診断お疲れ様でした。<br>もしこのツールがあなたの心の整理に役立ちましたら、<br>ぜひ開発支援をお願いいたします。</p>
+            <div class="modal-actions">
+                <a href="https://tegralshop.booth.pm/items/7930272" target="_blank" class="cyber-btn primary"
+                    style="width:100%">支援ページへ (BOOTH)</a>
+                <button id="close-modal-btn" class="cyber-btn danger" style="width:100%" onclick="closeModal()">閉じる
+                    (CLOSE)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
