@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Layer 7</title>
+    <style>
+        body { background-color: #000; color: #0f0; font-family: "Courier New", Courier, monospace; padding: 60px; margin: 0; }
+        .terminal { max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .prompt { display: flex; align-items: center; margin-top: 20px; }
+        .prompt span { margin-right: 10px; }
+        input { background: transparent; border: none; color: #0f0; font-family: "Courier New", Courier, monospace; font-size: 18px; outline: none; width: 400px; caret-color: #0f0; }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <p>====================================</p>
+        <p>SECURITY LEVEL 7: FINAL GATE</p>
+        <p>====================================</p>
+        <p>IDENTIFICATION REQUIRED.</p>
+        <p>ストアページに記されし、この迷宮の「創造主（開発者）」の名前を答えよ。</p>
+        <div class="prompt">
+            <span>> </span><input type="text" id="answer" autocomplete="off" autofocus>
+        </div>
+    </div>
+    <script>
+        document.getElementById('answer').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                const val = this.value.trim().toLowerCase();
+                if (val === 'icarus' || val === 'icarus_studio' || val === 'icarus studio') {
+                    window.location.href = 'hidden_maze.html';
+                } else {
+                    alert('ACCESS DENIED. INCORRECT CREATOR NAME.');
+                    this.value = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

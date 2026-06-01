@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Layer 5</title>
+    <style>
+        body { background-color: #050505; color: #f00; font-family: monospace; line-height: 1.8; overflow-x: hidden; margin: 0; }
+        .content { padding: 40px; font-size: 14px; }
+        .hidden-btn {
+            opacity: 0;
+            background: transparent;
+            border: 1px solid #f00;
+            color: #f00;
+            cursor: pointer;
+            padding: 10px 20px;
+            margin-bottom: 100px;
+            font-size: 20px;
+            transition: opacity 0.5s;
+        }
+        .hidden-btn:hover { opacity: 1; box-shadow: 0 0 10px #f00; }
+    </style>
+</head>
+<body>
+    <div class="content" id="scroll-content"></div>
+    <div style="text-align: center;">
+        <button class="hidden-btn" onclick="window.location.href='layer_6.html'">脱出口はこちら</button>
+    </div>
+    <script>
+        const content = document.getElementById('scroll-content');
+        let html = "";
+        for(let i = 0; i < 2000; i++) {
+            html += "私は迷宮にいる。<br>";
+        }
+        content.innerHTML = html;
+    </script>
+</body>
+</html>
