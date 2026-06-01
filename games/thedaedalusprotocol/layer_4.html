@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Layer 4</title>
+    <style>
+        body { background-color: #000; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; overflow: hidden; }
+        .eye { font-size: 120px; transition: all 0.5s; cursor: default; user-select: none; }
+        .eye.active { color: #f00; text-shadow: 0 0 50px #f00; transform: scale(1.2); }
+        #link { display: none; margin-top: 40px; color: #f00; text-decoration: none; font-size: 24px; border: 1px solid #f00; padding: 15px 30px; letter-spacing: 2px; }
+        #link:hover { background-color: #300; }
+    </style>
+</head>
+<body>
+    <div class="eye" id="eye">👁️</div>
+    <a href="layer_5.html" id="link">ENTER NEXT LAYER</a>
+    <script>
+        console.log("【ヒント】古代のコマンド： ↑ ↑ ↓ ↓ ← → ← → B A");
+        const konami = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+        let konamiIndex = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.key === konami[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konami.length) {
+                    document.getElementById('eye').classList.add('active');
+                    document.getElementById('link').style.display = 'block';
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+    </script>
+</body>
+</html>

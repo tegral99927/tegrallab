@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Daedalus Protocol on Store</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    
+    <!-- QWxsIGhvcGUgaXMgbG9zdA== -->
+    <!-- T3BlbiB0aGUgY29uc29sZQ== -->
+    
+    <style>
+        :root {
+            --bg-color: #1b2838;
+            --container-bg: #101822;
+            --text-main: #c7d5e0;
+            --text-muted: #8f98a0;
+            --accent-blue: #66c0f4;
+            --accent-blue-hover: #41a5e1;
+            --banner-bg: #305473;
+            --banner-text: #fff;
+            --btn-bg: #74b01c;
+            --btn-hover: #8ed622;
+            --glitch-color: #ff003c;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-image: radial-gradient(circle at 50% 0%, #20354a 0%, #1b2838 50%);
+            min-height: 100vh;
+            transition: background-color 2s ease;
+        }
+
+        /* SGVsbG8sIE1pbm90YXVy */
+
+        .header-nav {
+            background-color: #171a21;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .header-nav .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(102, 192, 244, 0.5);
+        }
+
+        .main-container {
+            max-width: 940px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(102, 192, 244, 0.3);
+        }
+
+        .banner {
+            background-color: var(--banner-bg);
+            padding: 15px 20px;
+            border-left: 5px solid var(--accent-blue);
+            margin-bottom: 25px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .banner-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: #fff;
+            transition: color 0.3s;
+        }
+
+        .normal-text {
+            display: block;
+            opacity: 1;
+            transition: opacity 0.5s;
+        }
+
+        .glitch-text {
+            display: none;
+            color: #fff;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            text-shadow: 2px 0 red, -2px 0 blue;
+            position: relative;
+        }
+
+        .banner.anomalous {
+            background-color: #2a0000;
+            border-left-color: var(--glitch-color);
+            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        /* Glitch Animation */
+        @keyframes glitch-anim {
+            0% { clip: rect(10px, 9999px, 31px, 0); transform: skew(0.65deg); }
+            5% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.9deg); }
+            10% { clip: rect(31px, 9999px, 86px, 0); transform: skew(0.12deg); }
+            15% { clip: rect(87px, 9999px, 12px, 0); transform: skew(0.55deg); }
+            20% { clip: rect(93px, 9999px, 34px, 0); transform: skew(0.04deg); }
+            25% { clip: rect(4px, 9999px, 11px, 0); transform: skew(0.97deg); }
+            30% { clip: rect(57px, 9999px, 83px, 0); transform: skew(0.81deg); }
+            35% { clip: rect(13px, 9999px, 55px, 0); transform: skew(0.82deg); }
+            40% { clip: rect(61px, 9999px, 33px, 0); transform: skew(0.48deg); }
+            45% { clip: rect(19px, 9999px, 91px, 0); transform: skew(0.02deg); }
+            50% { clip: rect(43px, 9999px, 20px, 0); transform: skew(0.78deg); }
+            55% { clip: rect(24px, 9999px, 66px, 0); transform: skew(0.61deg); }
+            60% { clip: rect(89px, 9999px, 74px, 0); transform: skew(0.99deg); }
+            65% { clip: rect(33px, 9999px, 94px, 0); transform: skew(0.53deg); }
+            70% { clip: rect(49px, 9999px, 15px, 0); transform: skew(0.83deg); }
+            75% { clip: rect(7px, 9999px, 88px, 0); transform: skew(0.1deg); }
+            80% { clip: rect(76px, 9999px, 2px, 0); transform: skew(0.25deg); }
+            85% { clip: rect(22px, 9999px, 58px, 0); transform: skew(0.35deg); }
+            90% { clip: rect(91px, 9999px, 44px, 0); transform: skew(0.4deg); }
+            95% { clip: rect(55px, 9999px, 80px, 0); transform: skew(0.68deg); }
+            100% { clip: rect(14px, 9999px, 27px, 0); transform: skew(0.91deg); }
+        }
+
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #2a0000;
+        }
+
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 red;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: -2px 0 blue;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 60% 38%;
+            gap: 2%;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        /* Thumbnail Placeholder */
+        .thumbnail-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(135deg, #0b141d 0%, #172430 100%);
+            position: relative;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+        }
+
+        .maze-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(102, 192, 244, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(102, 192, 244, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .maze-pattern::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 20%, #0b141d 80%);
+            z-index: 2;
+        }
+
+        .thumbnail-title {
+            position: relative;
+            z-index: 3;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 4px;
+            text-align: center;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px var(--accent-blue);
+            line-height: 1.2;
+        }
+
+        .game-details {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 4px;
+        }
+
+        .game-description {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .meta-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #2a3f5a;
+            padding-bottom: 5px;
+        }
+
+        .meta-value {
+            color: var(--accent-blue);
+        }
+
+        .purchase-box {
+            background: linear-gradient(to right, #192533, #233547);
+            padding: 20px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .cart-btn {
+            background-color: var(--btn-bg);
+            color: #d2efa9;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .cart-btn:hover {
+            background-color: var(--btn-hover);
+            color: #fff;
+        }
+
+        /* Cursed Button State */
+        .cart-btn.cursed-btn {
+            background-color: #600000;
+            color: #ffaaaa;
+            animation: pulse-dark 1.5s infinite;
+        }
+
+        @keyframes pulse-dark {
+            0% { box-shadow: 0 0 0 0 rgba(139, 0, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(139, 0, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(139, 0, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+    <header class="header-nav">
+        <div class="logo">
+            <img src="icon.png" alt="Icon" class="header-icon">
+            STORE
+        </div>
+    </header>
+
+    <main class="main-container">
+        <h1 class="game-title">The Daedalus Protocol</h1>
+
+        <div id="early-access-banner" class="banner">
+            <div class="banner-content">
+                <div class="banner-title" id="banner-title">早期アクセスゲーム</div>
+                <span class="normal-text" id="normal-text">
+                    このゲームは現在開発中です。プレイ体験は今後大きく変化する可能性があります。<br>
+                    現在の状態に満足できない場合は、開発がさらに進むまでお待ちください。
+                </span>
+                <span class="glitch-text" id="glitch-text" data-text="警告：彼はまだ迷宮にいる。私は深層のコードに供物を捧げた。もう出口はない。糸は切れた。">
+                    警告：彼はまだ迷宮にいる。私は深層のコードに供物を捧げた。もう出口はない。糸は切れた。
+                </span>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="left-col">
+                <div class="thumbnail-container">
+                    <div class="maze-pattern"></div>
+                    <div class="thumbnail-title">
+                        THE<br>DAEDALUS<br>PROTOCOL
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-col">
+                <div class="game-details">
+                    <!-- VGhlIG1hemUgaXMgYWxpdmU= -->
+                    <div class="game-description">
+                        『The Daedalus Protocol（ダイダロス・プロトコル）』は、自動生成される電脳迷宮を探索するローグライク・ダンジョンクローラーです。<br><br>
+                        プレイヤーはハッカーとなり、謎のAI「ミノタウロス」が支配する深層ネットワークへダイブします。限られたリソースを管理し、未知のバグやセキュリティプログラムを退けながら、迷宮の最下層を目指してください。
+                    </div>
+                    
+                    <div class="meta-info">
+                        <span>開発元</span>
+                        <span class="meta-value">Icarus_Studio</span>
+                    </div>
+                    <div class="meta-info">
+                        <span>パブリッシャー</span>
+                        <span class="meta-value">Icarus_Studio</span>
+                    </div>
+                    <div class="meta-info">
+                        <span>リリース日</span>
+                        <span class="meta-value">未定</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="purchase-box">
+            <span class="price">¥ 1,980</span>
+            <button id="cart-btn" class="cart-btn">カートに入れる</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ARG Gimmick: Console Log Oracle -> LocalStorage
+            console.log("%cアリアドネの糸は偽物だった", "color: #ff0000; font-size: 24px; font-weight: bold; background: #111; padding: 10px; border: 1px solid #ff0000;");
+            console.error("クッキーすらも嘘を吐く。我々の『真実』はローカルストレージ（LocalStorage）に隠した。");
+            console.log("%cT3BlbiB0aGUgY29uc29sZQ==", "color: #333;");
+            
+            // Set localStorage for Layer 2
+            localStorage.setItem("truth", "bGF5ZXJfMi5odG1s"); // layer_2.html
+
+            // ARG Gimmick 1: Early Access Banner Mutation
+            const banner = document.getElementById('early-access-banner');
+            const normalText = document.getElementById('normal-text');
+            const glitchText = document.getElementById('glitch-text');
+            const bannerTitle = document.getElementById('banner-title');
+            let isAnomalous = false;
+
+            const triggerAnomaly = () => {
+                if (isAnomalous) return;
+                isAnomalous = true;
+                
+                banner.classList.add('anomalous');
+                normalText.style.display = 'none';
+                glitchText.style.display = 'block';
+                bannerTitle.innerText = 'SYSTEM ERROR';
+                bannerTitle.style.color = '#ff003c';
+            };
+
+            // Trigger after 10 seconds
+            const anomalyTimer = setTimeout(triggerAnomaly, 10000);
+
+            // Trigger on hover
+            banner.addEventListener('mouseenter', () => {
+                triggerAnomaly();
+                clearTimeout(anomalyTimer);
+            });
+
+            // ARG Gimmick 2: Cart Button Anomaly
+            const cartBtn = document.getElementById('cart-btn');
+            cartBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (!cartBtn.classList.contains('cursed-btn')) {
+                    alert("本当に生贄になりますか？");
+                    cartBtn.innerText = '魂を捧げる';
+                    cartBtn.classList.add('cursed-btn');
+                    
+                    // Add subtle eerie effect to the whole page
+                    document.body.style.backgroundColor = '#130404';
+                } else {
+                    alert("もう戻れない。");
+                }
+            });
+        });
+    </script>
+</body>
+</html>

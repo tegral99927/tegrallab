@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Layer 6</title>
+    <style>
+        body { background-color: #000; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: monospace; }
+        .loader {
+            border: 4px solid #333;
+            border-top: 4px solid #66c0f4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div style="text-align:center;">
+        <div class="loader"></div>
+        <p style="margin-top:20px; font-size: 18px; color: #66c0f4;">Loading System Data...</p>
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelector('p').innerText = "ERROR OCCURRED. CHECK CONSOLE.";
+            document.querySelector('p').style.color = "red";
+            document.querySelector('.loader').style.borderTopColor = "red";
+            throw new Error("MINOTAUR_DETECTED. 緊急プロトコル作動。ただちに URLの末尾を 'layer_7.html' へ書き換え、退避せよ。");
+        }, 3000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Layer 3</title>
+    <style>
+        body { 
+            background-color: #fff; 
+            color: #fff; /* 意図的に白文字にして隠す */
+            font-family: monospace; 
+            padding: 50px; 
+            text-align: center;
+        }
+        .hidden-text { font-size: 1.2rem; line-height: 2; }
+        #password-input { border: 1px solid #ccc; padding: 10px; margin-top: 20px; color: #000; font-size: 16px; }
+        #submit-btn { padding: 10px 20px; color: #000; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <div class="hidden-text">
+        <p>私は誰の目にも触れない。</p>
+        <p>「背景」の視点を変え、世界を黒く塗りつぶした者だけがこの言葉を見るだろう。</p>
+        <p>創造主がゲームに付けた『価値（価格）』を入力せよ。（数字のみ）</p>
+        <input type="text" id="password-input" placeholder="Password">
+        <br>
+        <button id="submit-btn">Unlock</button>
+    </div>
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            const val = document.getElementById('password-input').value;
+            if(val === "1980") {
+                window.location.href = "layer_4.html";
+            } else {
+                alert("不正解だ。");
+            }
+        });
+    </script>
+</body>
+</html>

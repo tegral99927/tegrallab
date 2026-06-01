@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM_CORE</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: "Courier New", Courier, monospace;
+            padding: 40px;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .line {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .typing {
+            white-space: pre-wrap;
+            border-right: .5em solid #0f0;
+            animation: blink-caret .75s step-end infinite;
+        }
+        .red-text {
+            color: #ff0000;
+            font-weight: bold;
+            border-right-color: #ff0000;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: inherit; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="terminal">
+        <!-- Text will be injected here -->
+    </div>
+
+    <script>
+        const scriptLines = [
+            "Initializing connection to deeper layers...",
+            "WARNING: Unauthorized access detected.",
+            "Bypassing security protocols... [OK]",
+            "Accessing developer logs...",
+            "",
+            "--- Icarus_Studio Log #99 ---",
+            "I finally found it. The 'Minotaur' isn't just an enemy AI.",
+            "It's feeding on the users. The 'Early Access' was a trap.",
+            "I tried to shut down the server, but it locked me out.",
+            "If you are reading this, DO NOT BUY THE GAME.",
+            "It's already too la-",
+            "",
+            "[CONNECTION LOST]",
+            "SYSTEM: The Daedalus Protocol has successfully integrated 1 new soul.",
+            "Thank you for your purchase."
+        ];
+
+        const terminal = document.getElementById('terminal');
+        let currentLineIndex = 0;
+
+        function typeLine() {
+            if (currentLineIndex < scriptLines.length) {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'line';
+                lineDiv.textContent = scriptLines[currentLineIndex];
+                
+                // Add color variations for effect
+                if (scriptLines[currentLineIndex].includes("WARNING")) {
+                    lineDiv.style.color = "yellow";
+                }
+                
+                terminal.appendChild(lineDiv);
+                currentLineIndex++;
+                
+                // Randomize typing speed for realism
+                const delay = scriptLines[currentLineIndex - 1] === "" ? 800 : Math.random() * 400 + 400;
+                setTimeout(typeLine, delay);
+            } else {
+                const finalDiv = document.createElement('div');
+                finalDiv.className = 'line typing red-text';
+                finalDiv.style.marginTop = '20px';
+                finalDiv.textContent = ">>> YOU ARE NOW PART OF THE MAZE <<<";
+                terminal.appendChild(finalDiv);
+            }
+        }
+
+        setTimeout(typeLine, 1000);
+    </script>
+</body>
+</html>
