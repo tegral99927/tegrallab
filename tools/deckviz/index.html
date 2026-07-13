@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Deck Viz-MTG infographic Tool</title>
+  <!-- Favicon & OGP -->
+  <link rel="icon" href="./icon.png" type="image/png">
+  <meta property="og:title" content="Deck Viz-MTG infographic Tool">
+  <meta property="og:description" content="マジック：ザ・ギャザリングのデッキやインフォグラフィックを簡単に作成できる画像編集ツール。">
+  <meta property="og:image" content="https://tegral99927.github.io/tegrallab/tools/deckviz/ogp.png">
+  <meta property="og:url" content="https://tegral99927.github.io/tegrallab/tools/deckviz/">
+  <meta property="og:type" content="website">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- ファンコンテンツポリシーモーダル -->
+  <div id="fan-content-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h3 style="margin-bottom: 12px;">ファンコンテンツ・ポリシーに関する明記<br><span style="font-size: 14px; font-weight: normal; color: var(--text-muted);">Fan Content Policy Disclaimer</span></h3>
+      <p style="font-size: 14px; line-height: 1.5; margin-bottom: 12px;">
+        Deck Vizは、ウィザーズ・オブ・ザ・コースト社のファンコンテンツ・ポリシーに沿った非公式のファンコンテンツです。ウィザーズ社の認可/許諾は得ていません。題材の一部に、ウィザーズ・オブ・ザ・コースト社の財産を含んでいます。©Wizards of the Coast LLC.
+      </p>
+      <p style="font-size: 12px; line-height: 1.5; margin-bottom: 24px; color: var(--text-muted);">
+        Deck Viz is unofficial Fan Content permitted under the Fan Content Policy. Not approved/endorsed by Wizards. Portions of the materials used are property of Wizards of the Coast. ©Wizards of the Coast LLC.
+      </p>
+      <button id="close-modal-btn" class="icon-btn primary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 8px; font-size: 16px;">確認しました / I Understand</button>
+    </div>
+  </div>
+
+  <!-- モバイル用ヘッダー -->
+  <div class="mobile-header">
+    <div class="mobile-header-row1">
+      <a href="/pages/tools.html" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 4px; margin-right: auto;" title="ツール一覧に戻る">
+        <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+      </a>
+      <i data-lucide="layers" style="color: var(--success); width: 20px; height: 20px; flex-shrink: 0; margin-left: -20px;"></i>
+      <span id="file-name-mobile" class="editable-title" contenteditable="true" spellcheck="false" style="margin-right: auto;">無題のデザイン</span>
+    </div>
+    <div class="mobile-header-row2">
+      <select id="canvas-size-mobile" style="background: var(--bg-panel); color: white; border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; font-size: 12px; outline: none;">
+        <option value="1200x675">16:9 (1200x675)</option>
+        <option value="1200x900">4:3 (1200x900)</option>
+        <option value="1080x1080">1:1 (1080x1080)</option>
+        <option value="1500x500">Twitter (1500x500)</option>
+        <option value="1920x1080">YouTube (1920x1080)</option>
+        <option value="1080x1920">Shorts (1080x1920)</option>
+      </select>
+      <div style="display: flex; align-items: center; gap: 4px; font-size: 12px;">
+        <span>背景色変更:</span>
+        <input type="color" id="bg-color-mobile" value="#1e293b" title="背景色を変更" style="width: 28px; height: 28px; border: none; padding: 0; background: transparent; cursor: pointer;">
+      </div>
+    </div>
+    <div class="mobile-header-row3">
+      <button class="icon-btn primary" id="save-btn-mobile" title="保存" style="padding: 8px 16px; font-size: 14px;">
+        <i data-lucide="save" style="width: 16px; height: 16px;"></i> 保存
+      </button>
+      <button class="icon-btn" id="export-png-btn-mobile" title="PNG" style="padding: 8px 16px; font-size: 14px;">
+        <i data-lucide="download" style="width: 16px; height: 16px;"></i> PNG
+      </button>
+      <button class="icon-btn" id="export-jpeg-btn-mobile" title="JPEG" style="padding: 8px 16px; font-size: 14px;">
+        <i data-lucide="download" style="width: 16px; height: 16px;"></i> JPG
+      </button>
+    </div>
+  </div>
+
+  <!-- 左側/下部ツールエリア -->
+  <div id="sidebar-container" class="sidebar-container collapsed">
+    <div id="bottom-sheet-handle" class="bottom-sheet-handle">
+      <div class="bottom-sheet-title" id="sheet-title">カード検索</div>
+    </div>
+
+    <div class="sidebar-inner">
+      <div class="icon-nav">
+        <button class="tab-btn active" data-tab="search" title="カード検索"><i data-lucide="search"></i></button>
+        <button class="tab-btn" data-tab="text" title="テキスト"><i data-lucide="type"></i></button>
+        <button class="tab-btn" data-tab="shape" title="図形・枠"><i data-lucide="shapes"></i></button>
+      </div>
+
+      <div class="panel-area">
+        <div class="panel-header">
+          <h2 id="panel-title" class="panel-title">カード検索</h2>
+        </div>
+
+        <div class="panel-content">
+          <!-- 検索タブ -->
+          <div id="tab-search" class="tab-pane no-pad">
+            <div class="search-form-container">
+              <form id="search-form">
+                <div class="search-input-group">
+                  <input type="text" id="search-input" class="search-input" value="" placeholder="例: set:dsk, t:creature...">
+                  <button type="submit" class="search-btn"><i data-lucide="search" style="width: 16px; height: 16px;"></i></button>
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="search-lang-ja" checked> 日本語カードを優先
+                </label>
+              </form>
+            </div>
+            <div id="search-results" class="search-results">
+              <div style="text-align: center; color: var(--text-muted); margin-top: 20px; font-size: 14px;">
+                検索キーワードを入力してください
+              </div>
+            </div>
+          </div>
+
+          <!-- テキストタブ -->
+          <div id="tab-text" class="tab-pane hidden">
+            <p class="action-hint">ドラッグ＆ドロップで追加</p>
+            <div class="draggable-item tool-item-box" draggable="true" data-type="text" data-text="DECK TECH">
+              <span class="tool-label">見出し</span>
+              <div class="tool-text-lg">DECK TECH</div>
+            </div>
+            <div class="draggable-item tool-item-box" draggable="true" data-type="text" data-text="Text Box">
+              <span class="tool-label">テキスト</span>
+              <div class="tool-text-lg" style="font-size: 16px;">Text Box</div>
+            </div>
+          </div>
+
+          <!-- 図形・矢印タブ -->
+          <div id="tab-shape" class="tab-pane hidden">
+            <p class="action-hint">ドラッグ＆ドロップで追加</p>
+            <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <!-- 統率者枠 -->
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="commander" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 140" preserveAspectRatio="none">
+                    <rect x="5" y="5" width="90" height="130" fill="rgba(30,41,59,0.3)" stroke="#fbbf24" stroke-width="4" rx="8" stroke-dasharray="4" vector-effect="non-scaling-stroke"/>
+                    <text x="50" y="25" fill="#fbbf24" font-size="12" text-anchor="middle" font-weight="bold">CMD</text>
+                  </svg>
+                </div>
+                <span class="tool-label">統率者枠</span>
+              </div>
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="arrow" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="M10,50 L80,50 M80,30 L100,50 L80,70" stroke="var(--success)" fill="none" stroke-width="4" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                </div>
+                <span class="tool-label">矢印</span>
+              </div>
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="rect" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <rect x="10" y="10" width="80" height="80" fill="transparent" stroke="var(--success)" stroke-width="4" vector-effect="non-scaling-stroke" rx="8"/>
+                  </svg>
+                </div>
+                <span class="tool-label">四角</span>
+              </div>
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="circle" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="var(--success)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                </div>
+                <span class="tool-label">円</span>
+              </div>
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="line" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <line x1="5" y1="50" x2="95" y2="50" stroke="var(--success)" stroke-width="4" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                </div>
+                <span class="tool-label">直線</span>
+              </div>
+              <div class="draggable-item tool-item-box" draggable="true" data-type="shape" data-shape="dashed" style="margin-bottom:0;">
+                <div class="shape-preview">
+                  <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <line x1="5" y1="50" x2="95" y2="50" stroke="var(--success)" stroke-width="4" stroke-dasharray="8 4" vector-effect="non-scaling-stroke"/>
+                  </svg>
+                </div>
+                <span class="tool-label">点線</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- メインワークスペース -->
+  <div class="main-workspace">
+    <!-- PCトップバー -->
+    <div class="top-bar">
+      <div class="top-bar-title">
+        <a href="/pages/tools.html" style="background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); padding: 6px; margin-right: 8px;" title="ツール一覧に戻る">
+          <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+        </a>
+        <i data-lucide="layers" style="color: var(--success);"></i>
+        <span id="file-name-pc" class="editable-title" contenteditable="true" spellcheck="false">無題のデザイン</span>
+        <select id="canvas-size-pc" style="background: var(--bg-panel-hover); color: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 6px; font-size: 14px; outline: none; margin-left: 12px; cursor: pointer;">
+          <option value="1200x675">16:9 ワイド (1200x675)</option>
+          <option value="1200x900">4:3 スタンダード (1200x900)</option>
+          <option value="1080x1080">1:1 正方形 (1080x1080)</option>
+          <option value="1500x500">Twitterヘッダー (1500x500)</option>
+          <option value="1920x1080">YouTubeサムネイル (1920x1080)</option>
+          <option value="1080x1920">ショート動画 (1080x1920)</option>
+        </select>
+        <div style="display: flex; align-items: center; gap: 6px; margin-left: 12px; font-size: 14px;">
+          <span>背景色変更:</span>
+          <input type="color" id="bg-color-pc" value="#1e293b" title="背景色を変更" style="width: 32px; height: 32px; border: none; padding: 0; background: transparent; cursor: pointer;">
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="icon-btn primary" id="save-btn-pc" style="padding: 8px 16px; border-radius: 8px;">
+          <i data-lucide="save" style="width: 16px; height: 16px;"></i> 保存
+        </button>
+        <button class="export-btn" id="export-png-btn" title="PNGでエクスポート"><i data-lucide="download" style="width: 16px; height: 16px;"></i> PNG</button>
+        <button class="export-btn" id="export-jpeg-btn" title="JPEGでエクスポート"><i data-lucide="download" style="width: 16px; height: 16px;"></i> JPEG</button>
+      </div>
+    </div>
+
+    <!-- フローティングツールバー -->
+    <div id="floating-toolbar" class="floating-toolbar hidden">
+      <div id="text-controls" class="hidden" style="display: flex; align-items: center; gap: 4px;">
+        <span style="font-size: 12px; font-weight: bold; margin-left: 4px;">フォントサイズ:</span>
+        <input type="number" id="floating-font-size" value="48" min="10" max="200" title="文字サイズ" style="width: 48px; background: var(--bg-panel); color: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 2px; text-align: center;">
+        <input type="color" id="floating-font-color" value="#ffffff" title="文字色" style="width: 24px; height: 24px; border: none; padding: 0; background: transparent; cursor: pointer; margin-left: 4px;">
+        <div class="divider"></div>
+      </div>
+      <button id="floating-zup-btn" class="toolbar-btn" title="前面へ">
+        <i data-lucide="chevron-up" style="width: 16px; height: 16px;"></i>
+      </button>
+      <button id="floating-zdown-btn" class="toolbar-btn" title="背面へ">
+        <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
+      </button>
+      <div class="divider"></div>
+      <button id="floating-rotate-btn" class="toolbar-btn" title="90度回転">
+        <i data-lucide="rotate-cw" style="width: 16px; height: 16px;"></i> 回転
+      </button>
+      <div class="divider"></div>
+      <button id="floating-delete-btn" class="toolbar-btn danger" title="削除">
+        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i> 削除
+      </button>
+    </div>
+
+    <!-- キャンバス -->
+    <div id="canvas-container" class="canvas-container">
+      <div id="canvas-wrapper-outer">
+        <div id="canvas-wrapper" class="canvas-wrapper">
+          <div id="canvas" class="canvas-board">
+            <div id="canvas-guide" class="canvas-guide">
+              <i data-lucide="image" style="width: 64px; height: 64px; opacity: 0.5;"></i>
+              <p id="guide-text">要素を追加してください</p>
+            </div>
+            <div id="elements-layer" class="elements-layer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">保存しました</div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
