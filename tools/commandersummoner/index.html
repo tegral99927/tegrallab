@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Summoner - MTG統率者召喚ツール</title>
+    <!-- Google Fonts: ファンタジー風のフォントを読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Favicon & Icon -->
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- OGP / Social Meta Tags -->
+    <meta property="og:title" content="Commander Summoner - 統率者召喚ツール">
+    <meta property="og:description" content="条件を指定してランダムに統率者カードを召喚するWebツール">
+    <meta property="og:image" content="ogp.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Commander Summoner - 統率者召喚ツール">
+    <meta name="twitter:description" content="条件を指定してランダムに統率者カードを召喚するWebツール">
+    <meta name="twitter:image" content="ogp.png">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Commander Summoner</h1>
+    </header>
+
+    <div id="messageBox"></div>
+
+    <!-- 1. 表示画像をヘッダー直下に -->
+    <div class="arena">
+        <div class="summon-circle"></div>
+        <div class="card-scene">
+            <div class="card-container" id="cardContainer">
+                <!-- 表面（取得したカード） -->
+                <div class="card-face card-front">
+                    <img id="cardImage" src="" alt="Summoned Card">
+                </div>
+                <!-- 裏面（初期状態） -->
+                <div class="card-face card-back">
+                    <div class="card-back-logo"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- カード情報表示 -->
+        <div class="card-info" id="cardInfo">
+            <h2 id="cardName">Card Name</h2>
+            <p id="cardType">Card Type</p>
+        </div>
+    </div>
+
+    <!-- 2. 召喚ボタンを画像の下に -->
+    <div class="action-area">
+        <button id="summonBtn" class="summon-btn">召喚 (Summon)</button>
+    </div>
+
+    <!-- 3. 条件指定をその下に（展開・折りたたみ） -->
+    <div class="filter-section">
+        <button id="filterToggleBtn" class="filter-toggle-btn">条件を指定する ▼</button>
+        
+        <div id="filterContent" class="filter-content">
+            <div class="controls">
+                <div class="control-group">
+                    <div class="title">Color</div>
+                    <div class="control-note">※複数選択可。未選択の場合は全色からランダム。</div>
+                    
+                    <input type="checkbox" name="color" id="color-w" value="w" class="toggle-btn">
+                    <label for="color-w" class="toggle-label">⚪️ 白</label>
+
+                    <input type="checkbox" name="color" id="color-u" value="u" class="toggle-btn">
+                    <label for="color-u" class="toggle-label">💧 青</label>
+
+                    <input type="checkbox" name="color" id="color-b" value="b" class="toggle-btn">
+                    <label for="color-b" class="toggle-label">💀 黒</label>
+
+                    <input type="checkbox" name="color" id="color-r" value="r" class="toggle-btn">
+                    <label for="color-r" class="toggle-label">🔥 赤</label>
+
+                    <input type="checkbox" name="color" id="color-g" value="g" class="toggle-btn">
+                    <label for="color-g" class="toggle-label">🌳 緑</label>
+
+                    <input type="checkbox" name="color" id="color-c" value="c" class="toggle-btn">
+                    <label for="color-c" class="toggle-label">✧ 無色</label>
+                </div>
+
+                <div class="control-group">
+                    <div class="title">Mana Value</div>
+                    <input type="radio" name="mana" id="mana-all" value="all" class="toggle-btn" checked>
+                    <label for="mana-all" class="toggle-label">指定なし</label>
+
+                    <input type="radio" name="mana" id="mana-3" value="<=3" class="toggle-btn">
+                    <label for="mana-3" class="toggle-label">3以下</label>
+
+                    <input type="radio" name="mana" id="mana-4" value="=4" class="toggle-btn">
+                    <label for="mana-4" class="toggle-label">4</label>
+
+                    <input type="radio" name="mana" id="mana-5" value=">=5" class="toggle-btn">
+                    <label for="mana-5" class="toggle-label">5以上</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
