@@ -1,0 +1,8 @@
+# robots.txt for Muga
+# https://tegrallab.com/tools/muga/
+
+User-agent: *
+Allow: /
+
+# Sitemap URL (Update this domain if hosting on a custom root domain)
+Sitemap: https://tegrallab.com/tools/muga/sitemap.xml

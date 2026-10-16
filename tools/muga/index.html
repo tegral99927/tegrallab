@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <!-- Google Analytics (Tegral Lab Common) -->
+  <script src="/asset/js/gtag.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Muga | 音に身を委ねる、静かな時間</title>
+
+  <!-- Meta Description & SEO -->
+  <meta name="description"
+    content="音楽に身を委ね、思考から少し離れるための静かなWebアプリ「Muga」。目を閉じて、ただ音を聴く。何かを達成する必要のない、シンプルな音楽体験を。">
+  <meta name="keywords" content="無我, 瞑想, 音楽, アンビエントミュージック, マインドフルネス, リラックス, 無為自然, 東洋哲学">
+  <meta name="author" content="Tegral Lab">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL: Set your final production URL here -->
+  <link rel="canonical" href="https://tegrallab.com/tools/muga/">
+
+  <!-- Favicons & Icons -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Open Graph Protocol (OGP) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Muga (無我)">
+  <meta property="og:title" content="Muga | 音に身を委ねる、静かな時間">
+  <meta property="og:description"
+    content="音楽に身を委ね、思考から少し離れるための静かなWebアプリ「Muga」。目を閉じて、ただ音を聴く。何かを達成する必要のない、シンプルな音楽体験を。">
+  <meta property="og:url" content="https://tegrallab.com/tools/muga/">
+  <meta property="og:image" content="https://tegrallab.com/tools/muga/assets/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Muga | 音に身を委ねる、静かな時間">
+  <meta name="twitter:description"
+    content="音楽に身を委ね、思考から少し離れるための静かなWebアプリ「Muga」。目を閉じて、ただ音を聴く。何かを達成する必要のない、シンプルな音楽体験を。">
+  <meta name="twitter:image" content="https://tegrallab.com/tools/muga/assets/ogp.png">
+
+  <!-- Web Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Shippori+Mincho:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Muga",
+    "alternateName": "無我",
+    "url": "https://tegrallab.com/tools/muga/",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "All",
+    "description": "音楽に身を委ね、思考から少し離れるための静かなWebアプリ「Muga」。目を閉じて、ただ音を聴く。何かを達成する必要のない、シンプルな音楽体験を。",
+    "browserRequirements": "Requires JavaScript. Requires HTML5 Audio or Web Audio API support.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Tegral Lab",
+      "url": "https://tegrallab.com/"
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <!-- Ambient Breathing Light Glow -->
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <!-- Screen Reader Live Region -->
+  <div id="live-status" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <a href="/pages/tools.html" class="back-link" title="ツール一覧へ戻る">
+      <span aria-hidden="true">←</span>
+      <span>Tegral Lab</span>
+    </a>
+    <span class="app-indicator" aria-hidden="true">Mindful Stillness</span>
+  </header>
+
+  <!-- Main Experience Stage -->
+  <main class="main-stage">
+    <!-- Emblem: Unclosed Enso Circle -->
+    <div class="enso-container" id="enso-wrapper" aria-hidden="true">
+      <svg class="enso-svg" viewBox="0 0 512 512" width="100%" height="100%">
+        <defs>
+          <linearGradient id="ensoGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+            <stop offset="70%" stop-color="#cfd2dc" stop-opacity="0.65" />
+            <stop offset="100%" stop-color="#808492" stop-opacity="0.15" />
+          </linearGradient>
+        </defs>
+        <path d="M 256 86 A 170 170 0 1 1 130 142" fill="none" stroke="url(#ensoGlow)" stroke-width="12"
+          stroke-linecap="round" />
+        <circle cx="256" cy="256" r="3" fill="#e2e5ec" opacity="0.6" />
+      </svg>
+    </div>
+
+    <!-- Scene 1: Standby (Initial State) -->
+    <section id="scene-idle" class="scene active" aria-labelledby="app-heading">
+      <h1 id="app-heading" class="app-title">Muga</h1>
+      <p class="app-subtext">ただ、音に身を委ねる。</p>
+
+      <button id="play-btn" class="primary-btn" type="button" aria-label="音楽の再生を開始する">
+        <span>音を聴く</span>
+      </button>
+
+      <div class="guidance-box" aria-label="体験のご案内">
+        <p class="guidance-text">心地よい姿勢になり、目を閉じてください。</p>
+        <p class="guidance-text">何かを感じようとする必要はありません。</p>
+      </div>
+    </section>
+
+    <!-- Scene 2: Playing State -->
+    <section id="scene-playing" class="scene" aria-hidden="true" aria-live="polite">
+      <h2 class="playing-message">目を閉じて、ただ音に身を委ねてください。</h2>
+      <p class="playing-submessage">何もしなくて大丈夫です。</p>
+
+      <div class="playing-controls" aria-label="再生コントロール">
+        <button id="pause-resume-btn" class="control-btn" type="button" aria-label="音楽を一時停止" title="一時停止">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        </button>
+
+        <button id="stop-btn" class="control-btn" type="button" aria-label="音楽を停止する" title="停止">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Scene 3: Ended State (Stillness) -->
+    <section id="scene-ended" class="scene" aria-hidden="true" aria-live="polite">
+      <h2 class="ended-message">音が終わりました。</h2>
+      <p class="ended-submessage">この静けさも、そのままに。</p>
+
+      <button id="replay-btn" class="primary-btn" type="button" aria-label="もう一度、ランダムに音楽を再生する">
+        <span>もう一度、音に委ねる</span>
+      </button>
+    </section>
+
+    <!-- Quiet Volume Controls (Shared across states, visually minimal) -->
+    <div class="volume-panel" aria-label="音量設定">
+      <button id="mute-btn" class="volume-icon-btn" type="button" aria-label="音声をミュート" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+      <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="80"
+        aria-label="マスター音量" aria-valuemin="0" aria-valuemax="100" aria-valuenow="80">
+    </div>
+  </main>
+
+  <!-- Notification Toast -->
+  <aside id="message-toast" class="message-toast" role="status" aria-live="polite"></aside>
+
+  <!-- Subtle Minimal Footer -->
+  <footer class="app-footer">
+    <p>Muga &mdash; Nothing to achieve. Simply surrender to sound.</p>
+  </footer>
+
+  <!-- Core Script -->
+  <script src="script.js"></script>
+</body>
+
+</html>
