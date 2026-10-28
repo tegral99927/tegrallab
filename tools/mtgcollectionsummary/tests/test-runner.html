@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>MTGCollectionSummary - Test Runner</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { padding: 30px; max-width: 900px; margin: 0 auto; background-color: var(--bg-primary); color: var(--text-primary); }
+    .test-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 16px; margin-bottom: 24px; }
+    .test-suite-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px; }
+    .test-result-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--border-color); font-size: 13px; }
+    .test-pass { color: var(--success-color); font-weight: bold; }
+    .test-fail { color: var(--danger-color); font-weight: bold; }
+    .summary-badge { padding: 6px 14px; border-radius: 9999px; font-weight: bold; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="test-header">
+    <div>
+      <h1>🧪 MTGCollectionSummary 自動テスト</h1>
+      <p style="color: var(--text-muted); font-size: 13px;">カード照合、ハイランダー判定、固有色、超幾何分布計算、インポート/エクスポート検証</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="btn-run-tests">▶ テスト再実行</button>
+  </div>
+
+  <div class="test-suite-box">
+    <div style="display: flex; gap: 16px; margin-bottom: 20px;" id="test-summary-bar">
+      <div class="summary-badge alert-info" id="badge-total">総テスト数: -</div>
+      <div class="summary-badge alert-success" id="badge-passed">成功: -</div>
+      <div class="summary-badge alert-danger" id="badge-failed">失敗: -</div>
+    </div>
+    <div id="test-results-container"></div>
+  </div>
+
+  <!-- Source files required for tests -->
+  <script src="../js/utils.js"></script>
+  <script src="../js/db.js"></script>
+  <script src="../js/scryfall.js"></script>
+  <script src="../js/deck-validator.js"></script>
+  <script src="../js/importer.js"></script>
+  <script src="../js/exporter.js"></script>
+  <script src="../js/statistics.js"></script>
+  <script src="../js/summary.js"></script>
+  <script src="../js/collection.js"></script>
+  <script src="../js/deckbuilder.js"></script>
+  <script src="test-suite.js"></script>
+
+  <script>
+    async function executeTests() {
+      const container = document.getElementById('test-results-container');
+      container.innerHTML = '<div style="color: var(--text-muted);">テスト実行中...</div>';
+
+      const res = await window.TestRunnerInstance.run();
+
+      document.getElementById('badge-total').textContent = `総テスト数: ${res.total}`;
+      document.getElementById('badge-passed').textContent = `成功: ${res.passed}`;
+      document.getElementById('badge-failed').textContent = `失敗: ${res.failed}`;
+
+      container.innerHTML = res.results.map(r => `
+        <div class="test-result-row">
+          <span>${r.name}</span>
+          <span class="${r.passed ? 'test-pass' : 'test-fail'}">
+            ${r.passed ? `✓ PASS (${r.duration}ms)` : `✕ FAIL: ${r.error.message}`}
+          </span>
+        </div>
+      `).join('');
+    }
+
+    document.getElementById('btn-run-tests').addEventListener('click', executeTests);
+    window.addEventListener('DOMContentLoaded', executeTests);
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <!-- Google Analytics -->
+  <script src="/asset/js/gtag.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTGCollectionSummary - MTGコレクション管理＆デッキ構築ツール | Tegral Lab</title>
+  <meta name="description" content="Magic: The Gathering（MTG）のカードコレクション管理・デッキ構築・所持状況照合・デッキ分析・サマリー出力をブラウザ単体で完結できる完全無料・ローカル保存型Webアプリケーション。">
+  <meta name="keywords" content="MTG, Magic: The Gathering, マジック・ザ・ギャザリング, コレクション管理, デッキビルダー, デッキ構築, 統率者戦, EDH, Scryfall, デッキ分析, サマリー出力, Tegral Lab">
+  <meta name="author" content="Tegral Lab">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tegrallab.com/tools/mtgcollectionsummary/">
+
+  <!-- Favicon / App Icons -->
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/tools/mtgcollectionsummary/icon.svg" type="image/svg+xml">
+  <link rel="icon" href="/tools/mtgcollectionsummary/icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/tools/mtgcollectionsummary/icon.png">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tegrallab.com/tools/mtgcollectionsummary/">
+  <meta property="og:title" content="MTGCollectionSummary - MTGコレクション管理＆デッキ構築ツール">
+  <meta property="og:description" content="MTGのカードコレクション管理、統率者・各フォーマットデッキ構築、所持率照合、統計分析、サマリー出力を1つで完結できる完全無料Webツール。">
+  <meta property="og:image" content="https://tegrallab.com/tools/mtgcollectionsummary/ogp.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="MTGCollectionSummary - MTGコレクション管理＆デッキ構築ツール">
+  <meta property="og:site_name" content="Tegral Lab">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://tegrallab.com/tools/mtgcollectionsummary/">
+  <meta name="twitter:title" content="MTGCollectionSummary - MTGコレクション管理＆デッキ構築ツール">
+  <meta name="twitter:description" content="MTGのカードコレクション管理、統率者・各フォーマットデッキ構築、所持率照合、統計分析、サマリー出力を1つで完結できる完全無料Webツール。">
+  <meta name="twitter:image" content="https://tegrallab.com/tools/mtgcollectionsummary/ogp.png">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MTGCollectionSummary",
+    "url": "https://tegrallab.com/tools/mtgcollectionsummary/",
+    "description": "Magic: The Gathering（MTG）のコレクション管理とデッキ構築・所持率照合・統計分析・サマリー出力をブラウザで完結する完全無料Webアプリケーション。",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "All",
+    "image": "https://tegrallab.com/tools/mtgcollectionsummary/ogp.png",
+    "author": {
+      "@type": "Organization",
+      "name": "Tegral Lab",
+      "url": "https://tegrallab.com/"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    }
+  }
+  </script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="brand-icon">🔮</span>
+        <div>
+          <div class="brand-title">MTGCollection</div>
+          <div class="brand-subtitle">Collection & Deck Suite</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-tab="dashboard">
+          <span class="nav-icon">📊</span> ダッシュボード
+        </button>
+        <button type="button" class="nav-item" data-tab="collection">
+          <span class="nav-icon">📦</span> コレクション管理
+        </button>
+        <button type="button" class="nav-item" data-tab="decks">
+          <span class="nav-icon">📚</span> デッキ一覧
+        </button>
+        <button type="button" class="nav-item" data-tab="deckbuilder">
+          <span class="nav-icon">🔨</span> デッキビルダー
+        </button>
+        <button type="button" class="nav-item" data-tab="search">
+          <span class="nav-icon">🔍</span> カード検索
+        </button>
+        <button type="button" class="nav-item" data-tab="summary">
+          <span class="nav-icon">📈</span> サマリー・統計
+        </button>
+        <button type="button" class="nav-item" data-tab="wishlist">
+          <span class="nav-icon">⭐</span> ウィッシュリスト
+        </button>
+        <button type="button" class="nav-item" data-tab="importer">
+          <span class="nav-icon">⇄</span> インポート / 出力
+        </button>
+        <button type="button" class="nav-item" data-tab="settings">
+          <span class="nav-icon">⚙️</span> 設定
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-theme-toggle">☀️ ライト</button>
+        <div style="font-size: 10px; color: var(--text-muted); text-align: center;">
+          Press "/" to Search
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="top-bar-title" id="page-header-title">MTGCollectionSummary</div>
+        <div class="top-bar-actions">
+          <button type="button" class="btn btn-sm btn-outline" data-go-tab="search">🔍 検索 ( / )</button>
+          <button type="button" class="btn btn-sm btn-primary" id="btn-new-deck">＋ 新規デッキ</button>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <!-- TAB 1: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-section active">
+          <div class="dash-stats-grid">
+            <div class="stat-box">
+              <span class="stat-label">総所有枚数</span>
+              <span class="stat-value" id="dash-stat-total-cards">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">ユニークカード数</span>
+              <span class="stat-value" id="dash-stat-unique-cards">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">作成済みデッキ</span>
+              <span class="stat-value" id="dash-stat-total-decks">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">コレクション推定総額</span>
+              <span class="stat-value" id="dash-stat-total-value">$0.00</span>
+            </div>
+          </div>
+
+          <div class="dash-sections-grid">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2>最近のデッキ</h2>
+                <button type="button" class="btn btn-sm btn-outline" data-go-tab="decks">デッキ一覧へ →</button>
+              </div>
+              <div id="dash-recent-decks" class="deck-grid"></div>
+            </div>
+            <div>
+              <div style="margin-bottom: 16px;">
+                <h2>高額所有カード Top 5</h2>
+              </div>
+              <div class="stat-box" id="dash-high-value-cards"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2: COLLECTION -->
+        <section id="tab-collection" class="tab-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <h2>コレクション管理 <small id="col-item-count" style="font-size: 14px; color: var(--text-muted);"></small></h2>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-col-add-card">＋ カードを探して登録</button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-col-batch-delete">一括削除</button>
+            </div>
+          </div>
+
+          <!-- Collection Filters -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; background-color: var(--bg-secondary); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <input type="text" id="col-filter-query" placeholder="カード名・メモ検索..." />
+            <input type="text" id="col-filter-set" placeholder="セット (例: ONE)" style="text-transform: uppercase;" />
+            <select id="col-filter-rarity">
+              <option value="">全レアリティ</option>
+              <option value="mythic">神話レア (Mythic)</option>
+              <option value="rare">レア (Rare)</option>
+              <option value="uncommon">アンコモン (Uncommon)</option>
+              <option value="common">コモン (Common)</option>
+            </select>
+            <select id="col-filter-foil">
+              <option value="all">Foil / 通常 全て</option>
+              <option value="foil">Foil のみ</option>
+              <option value="nonfoil">通常 のみ</option>
+            </select>
+            <select id="col-sort-select">
+              <option value="name_asc">名前順 (昇順)</option>
+              <option value="price_desc">価格順 (高→低)</option>
+              <option value="count_desc">所持数順 (多→少)</option>
+              <option value="date_desc">追加日順 (新→古)</option>
+            </select>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 32px;"><input type="checkbox" id="col-check-all"></th>
+                  <th>カード</th>
+                  <th>セット・番号</th>
+                  <th>レアリティ</th>
+                  <th>仕様</th>
+                  <th>状態</th>
+                  <th>枚数</th>
+                  <th>価格</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="col-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 3: DECKS -->
+        <section id="tab-decks" class="tab-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>保存済みデッキ一覧</h2>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-deck-compare">⚖️ デッキ比較</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-new-deck-alt" onclick="document.getElementById('btn-new-deck').click()">＋ 新規デッキ作成</button>
+            </div>
+          </div>
+          <div id="deck-list-grid" class="deck-grid"></div>
+        </section>
+
+        <!-- TAB 4: DECKBUILDER -->
+        <section id="tab-deckbuilder" class="tab-section">
+          <div id="deckbuilder-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 12px; flex: 1; max-width: 600px;">
+                <input type="text" id="deck-name-input" class="form-control" style="font-size: 18px; font-weight: bold;" />
+                <select id="deck-format-select" style="max-width: 160px;">
+                  <option value="commander">コマンダー (EDH)</option>
+                  <option value="pauper_edh">パウパーEDH</option>
+                  <option value="brawl">ブロール</option>
+                  <option value="standard">スタンダード</option>
+                  <option value="pioneer">パイオニア</option>
+                  <option value="modern">モダン</option>
+                  <option value="legacy">レガシー</option>
+                  <option value="vintage">ヴィンテージ</option>
+                  <option value="pauper">パウパー</option>
+                  <option value="historic">ヒストリック</option>
+                  <option value="explorer">エクスプローラー</option>
+                  <option value="alchemy">アルケミー</option>
+                  <option value="timeless">タイムレス</option>
+                  <option value="casual">カジュアル (自由)</option>
+                </select>
+                <select id="deck-bracket-select" style="max-width: 140px;" title="EDHブラケット設定">
+                  <option value="1">Bracket 1 (Jank)</option>
+                  <option value="2">Bracket 2 (Casual)</option>
+                  <option value="3">Bracket 3 (Upgraded)</option>
+                  <option value="4">Bracket 4 (High)</option>
+                  <option value="5">Bracket 5 (cEDH)</option>
+                </select>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-sm btn-secondary" id="btn-deck-undo" title="元に戻す (Ctrl+Z)">↩ 元に戻す</button>
+                <button type="button" class="btn btn-sm btn-secondary" id="btn-deck-redo" title="やり直す">↪ やり直す</button>
+                <button type="button" class="btn btn-sm btn-outline" id="btn-deck-snapshot">📸 スナップショット保存</button>
+                <button type="button" class="btn btn-sm btn-outline" id="btn-multi-deck-shortage">🔍 他デッキとの重複・不足分析</button>
+                <button type="button" class="btn btn-sm btn-primary" id="btn-open-simulator">🎲 初手シミュレーター</button>
+              </div>
+            </div>
+
+            <!-- Validation Messages -->
+            <div id="deck-validation-box" style="margin-bottom: 16px;"></div>
+
+            <!-- Two Column Builder -->
+            <div class="deckbuilder-layout">
+              <!-- Left Column: Commander & Sideboard -->
+              <div>
+                <div style="margin-bottom: 20px;">
+                  <h3 style="font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">統率者 (Commander)</h3>
+                  <div id="deck-commanders-list"></div>
+                </div>
+                <div>
+                  <h3 style="font-size: 15px; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+                    サイドボード <span id="deck-side-count-header" style="color: var(--text-muted); font-size: 12px;"></span>
+                  </h3>
+                  <div id="deck-sideboard-list"></div>
+                </div>
+              </div>
+
+              <!-- Right Column: Mainboard -->
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 4px;">
+                  <h3 style="font-size: 16px;">
+                    メインボード <span id="deck-main-count-header" style="color: var(--text-muted); font-size: 13px;"></span>
+                  </h3>
+                  <button type="button" class="btn btn-xs btn-outline" data-go-tab="search">＋ カード検索から追加</button>
+                </div>
+                <div id="deck-mainboard-list"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 5: SEARCH -->
+        <section id="tab-search" class="tab-section">
+          <div style="margin-bottom: 16px;">
+            <h2>カード検索 (Scryfall API)</h2>
+            <p style="font-size: 12px; color: var(--text-muted);">日本語名・英語名での検索に対応。日本語カードが存在する場合は日本語で優先表示します。</p>
+          </div>
+
+          <!-- Advanced Search Bar & Filters -->
+          <form id="search-filter-form" style="background-color: var(--bg-secondary); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 16px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+              <input type="search" id="search-input" placeholder="カード名を入力 (例: 太陽の指輪 / Sol Ring)..." style="font-size: 15px; padding: 10px 14px;" />
+              <button type="submit" class="btn btn-primary" style="padding: 0 20px;">検索</button>
+            </div>
+
+            <!-- Filter Controls -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; font-size: 13px;">
+              <div>
+                <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);">色フィルター:</label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <label><input type="checkbox" class="filter-color-chk" value="w"> 白</label>
+                  <label><input type="checkbox" class="filter-color-chk" value="u"> 青</label>
+                  <label><input type="checkbox" class="filter-color-chk" value="b"> 黒</label>
+                  <label><input type="checkbox" class="filter-color-chk" value="r"> 赤</label>
+                  <label><input type="checkbox" class="filter-color-chk" value="g"> 緑</label>
+                  <label><input type="checkbox" class="filter-color-chk" value="c"> 無</label>
+                </div>
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);">カードタイプ:</label>
+                <select id="filter-type">
+                  <option value="all">全タイプ</option>
+                  <option value="creature">クリーチャー</option>
+                  <option value="instant">インスタント</option>
+                  <option value="sorcery">ソーサリー</option>
+                  <option value="artifact">アーティファクト</option>
+                  <option value="enchantment">エンチャント</option>
+                  <option value="planeswalker">プレインズウォーカー</option>
+                  <option value="land">土地</option>
+                  <option value="battle">バトル</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);">フォーマット:</label>
+                <select id="filter-format">
+                  <option value="all">指定なし</option>
+                  <option value="commander">コマンダー (EDH)</option>
+                  <option value="standard">スタンダード</option>
+                  <option value="pioneer">パイオニア</option>
+                  <option value="modern">モダン</option>
+                  <option value="legacy">レガシー</option>
+                  <option value="pauper">パウパー</option>
+                </select>
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 4px; color: var(--text-secondary);">所持フィルター:</label>
+                <select id="filter-ownership">
+                  <option value="all">全て</option>
+                  <option value="owned">コレクション所有のみ</option>
+                  <option value="unowned">未所有のみ</option>
+                </select>
+              </div>
+            </div>
+          </form>
+
+          <!-- Search View Mode and Loader -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div id="search-loader" class="hidden" style="font-size: 13px; color: var(--accent-color); display: flex; align-items: center; gap: 8px;">
+              <span class="loading-spinner"></span> Scryfallから検索中...
+            </div>
+            <div style="display: flex; gap: 6px; margin-left: auto;">
+              <button type="button" class="btn btn-sm btn-secondary active" id="btn-view-grid">🖼️ グリッド</button>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-view-list">📄 リスト</button>
+            </div>
+          </div>
+
+          <div id="search-results-container"></div>
+          <div style="text-align: center; margin-top: 20px;">
+            <button type="button" class="btn btn-secondary" id="btn-search-load-more" style="display: none;">さらに読み込む</button>
+          </div>
+        </section>
+
+        <!-- TAB 6: SUMMARY & STATS -->
+        <section id="tab-summary" class="tab-section">
+          <div id="summary-view-content">
+            <!-- Summary Header Card with High-Visibility Target Selector -->
+            <div class="summary-header-card">
+              <div class="summary-header-top">
+                <div class="summary-title-wrap">
+                  <h2 id="summary-view-title" class="summary-heading">サマリー・統計分析</h2>
+                  <span id="summary-target-badge" class="badge badge-primary" style="font-size: 13px; padding: 4px 10px;">📦 コレクション全体</span>
+                </div>
+                <div class="summary-action-group">
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-copy-summary">📋 サマリーコピー</button>
+                  <button type="button" class="btn btn-sm btn-secondary" id="btn-download-summary">💾 TXT保存</button>
+                  <button type="button" class="btn btn-sm btn-primary" id="btn-print-summary">🖨️ PDF / 印刷出力</button>
+                </div>
+              </div>
+
+              <div class="summary-selector-bar">
+                <span class="selector-label">🎯 分析対象の選択:</span>
+                <div class="summary-segmented-controls">
+                  <button type="button" class="summary-seg-btn active" id="btn-seg-collection" title="コレクション全体の合計・統計を表示">
+                    <span class="seg-icon">📦</span>
+                    <span class="seg-text">コレクション全体</span>
+                    <span class="badge badge-outline" id="seg-col-count">0枚</span>
+                  </button>
+                  <div class="summary-deck-picker-wrap">
+                    <label for="summary-target-select" class="seg-icon" style="font-size: 16px; cursor: pointer;">🎴</label>
+                    <select id="summary-target-select" class="summary-deck-select" title="分析する構築デッキを選択">
+                      <option value="__collection__">📦 コレクション全体</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Metrics -->
+            <div class="dash-stats-grid">
+              <div class="stat-box">
+                <span class="stat-label">デッキ総枚数</span>
+                <span class="stat-value" id="stat-total-count">0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">土地 / 非土地</span>
+                <span class="stat-value" id="stat-land-count">0 / 0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">平均マナ総量 (CMC)</span>
+                <span class="stat-value" id="stat-avg-cmc">0.00</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">推定デッキ価格</span>
+                <span class="stat-value" id="stat-est-price">$0.00</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">コレクション所有率</span>
+                <span class="stat-value" id="stat-owned-ratio">100%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">不足カード枚数</span>
+                <span class="stat-value" id="stat-missing-count" style="color: var(--danger-color);">0枚</span>
+              </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="two-col-grid" style="margin-bottom: 24px;">
+              <div class="stat-box">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">マナカーブ分布 (土地を除く)</h3>
+                <div id="stat-mana-curve-chart"></div>
+              </div>
+              <div class="stat-box">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">色別構成 (カード枚数)</h3>
+                <div id="stat-color-dist"></div>
+              </div>
+            </div>
+
+            <div class="two-col-grid" style="margin-bottom: 24px;">
+              <div class="stat-box">
+                <h3 style="font-size: 15px; margin-bottom: 12px;">カードタイプ別内訳</h3>
+                <div id="stat-type-dist"></div>
+              </div>
+              <div class="stat-box">
+                <h3 id="stat-subtable-title" style="font-size: 15px; margin-bottom: 12px;">初手土地枚数確率 (超幾何分布 / 7枚)</h3>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead id="stat-subtable-head">
+                      <tr><th>土地枚数</th><th>確率</th><th>グラフ</th></tr>
+                    </thead>
+                    <tbody id="stat-hyper-table-body"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary Text Box & Missing Actions -->
+            <div class="stat-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <h3 style="font-size: 15px;">プレーンテキスト サマリー</h3>
+                <button type="button" class="btn btn-sm btn-outline" id="btn-missing-to-wishlist">⭐ 不足カードをウィッシュリストに一括登録</button>
+              </div>
+              <textarea id="summary-text-box" rows="12" readonly style="width: 100%; font-size: 12px; line-height: 1.5;"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 7: WISHLIST -->
+        <section id="tab-wishlist" class="tab-section">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>ウィッシュリスト (欲しいカード)</h2>
+            <button type="button" class="btn btn-sm btn-primary" data-go-tab="search">＋ カードを探して追加</button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>カード名</th>
+                  <th>希望枚数</th>
+                  <th>優先度</th>
+                  <th>参考価格</th>
+                  <th>関連デッキ</th>
+                  <th>状態</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="wishlist-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TAB 8: IMPORTER / EXPORTER -->
+        <section id="tab-importer" class="tab-section">
+          <div class="two-col-grid">
+            <!-- Left: Import Panel -->
+            <div class="stat-box">
+              <h2 style="font-size: 18px; margin-bottom: 8px;">デッキリスト・インポート</h2>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                MTG Arena (日/英)、晴れる屋形式、MTGO形式、CSV、通常テキスト形式を自動認識して取り込みます。
+              </p>
+              <textarea id="import-input-text" rows="12" placeholder="ここにデッキリストを貼り付けてください...&#10;例:&#10;Commander&#10;1 Atraxa, Grand Unifier (ONE) 196&#10;&#10;Deck&#10;1 Sol Ring (CMM) 410&#10;..."></textarea>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                <input type="file" id="import-file-input" accept=".txt,.csv,.json" style="max-width: 200px; font-size: 12px;" />
+                <button type="button" class="btn btn-primary" id="btn-parse-import">インポート解析・照合</button>
+              </div>
+              <div id="import-progress-box" class="hidden alert alert-info" style="margin-top: 12px;"></div>
+            </div>
+
+            <!-- Right: Export Panel -->
+            <div class="stat-box">
+              <h2 style="font-size: 18px; margin-bottom: 8px;">デッキリスト・エクスポート</h2>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">形式:</label>
+                  <select id="export-format-select">
+                    <option value="arena_ja">MTG Arena 日本語</option>
+                    <option value="arena_en">MTG Arena 英語 / 晴れる屋</option>
+                    <option value="mtgo">Magic Online (.dec)</option>
+                    <option value="txt">汎用テキスト (枚数＋カード名)</option>
+                    <option value="csv">CSV形式</option>
+                    <option value="json">アプリ完全JSON</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--text-secondary);">並び順:</label>
+                  <select id="export-sort-select">
+                    <option value="type">カードタイプ順</option>
+                    <option value="cmc">マナ総量順</option>
+                    <option value="name">名前順</option>
+                    <option value="count">枚数順</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display: flex; gap: 16px; margin-bottom: 12px; font-size: 12px;">
+                <label><input type="checkbox" id="export-include-set" checked> セット・コレクター番号を含める</label>
+                <label><input type="checkbox" id="export-include-side" checked> サイドボードを含める</label>
+              </div>
+              <textarea id="export-output-text" rows="10" readonly></textarea>
+              <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+                <button type="button" class="btn btn-secondary" id="btn-export-copy">クリップボードにコピー</button>
+                <button type="button" class="btn btn-primary" id="btn-export-download">ファイル保存</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 9: SETTINGS -->
+        <section id="tab-settings" class="tab-section">
+          <div style="max-width: 720px; display: flex; flex-direction: column; gap: 20px;">
+            <h2>アプリケーション設定</h2>
+
+            <div class="stat-box">
+              <h3 style="font-size: 16px; margin-bottom: 12px;">一般設定</h3>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span>表示通貨:</span>
+                <select id="setting-currency-select" style="max-width: 150px;">
+                  <option value="USD">USD ($)</option>
+                  <option value="JPY">JPY (¥)</option>
+                  <option value="EUR">EUR (€)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="stat-box">
+              <h3 style="font-size: 16px; margin-bottom: 12px;">データバックアップ & 復元</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                すべてのコレクション、デッキ、スナップショット、ウィッシュリストをローカルJSONファイルとして安全にバックアップ・復元できます。
+              </p>
+              <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" id="btn-backup-export">全データJSONバックアップ出力</button>
+                <label class="btn btn-outline" style="cursor: pointer;">
+                  JSONバックアップから復元
+                  <input type="file" id="backup-file-input" accept=".json" style="display: none;" />
+                </label>
+              </div>
+            </div>
+
+            <div class="stat-box">
+              <h3 style="font-size: 16px; margin-bottom: 12px;">キャッシュ管理</h3>
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                IndexedDBに保存されたScryfallの検索カードキャッシュをクリアします。
+              </p>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-clear-cache">カード検索キャッシュをクリア</button>
+            </div>
+
+            <div class="stat-box" style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">
+              <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">帰属・免責表示</h3>
+              <p>
+                本ツール「MTGCollectionSummary」はファンコンテンツ・ポリシーに沿った非公式のファンコンテンツです。ウィザーズ・オブ・ザ・コースト社による認可や承認を受けたものではありません。
+              </p>
+              <p style="margin-top: 6px;">
+                カード情報・画像は <a href="https://scryfall.com" target="_blank" rel="noopener noreferrer">Scryfall API</a> を利用して提供されています。Scryfallの利用規約に従い利用しています。
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: Card Detail -->
+  <div class="modal-overlay" id="card-detail-modal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <div class="modal-title">カード詳細</div>
+        <button type="button" class="modal-close" id="btn-close-card-modal">✕</button>
+      </div>
+      <div class="modal-body" id="card-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Import Preview -->
+  <div class="modal-overlay" id="import-preview-modal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <div class="modal-title">インポートプレビュー & 検証</div>
+        <button type="button" class="modal-close" id="btn-close-import-modal">✕</button>
+      </div>
+      <div class="modal-body" id="import-preview-body"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Hand Simulator -->
+  <div class="modal-overlay" id="hand-simulator-modal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <div class="modal-title">🎲 初手シミュレーター</div>
+        <button type="button" class="modal-close" id="btn-close-sim-modal">✕</button>
+      </div>
+      <div class="modal-body" id="simulator-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Multi-Deck Shortage Analyzer -->
+  <div class="modal-overlay" id="multi-shortage-modal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <div class="modal-title">複数デッキ同時構築 不足・重複分析</div>
+        <button type="button" class="modal-close" id="btn-close-multi-modal">✕</button>
+      </div>
+      <div class="modal-body" id="multi-shortage-body"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: Deck Compare -->
+  <div class="modal-overlay" id="deck-compare-modal">
+    <div class="modal-window modal-window-lg">
+      <div class="modal-header">
+        <div class="modal-title">⚖️ デッキ比較 (Deck Comparison)</div>
+        <button type="button" class="modal-close" id="btn-close-compare-modal">✕</button>
+      </div>
+      <div class="modal-body" id="deck-compare-body"></div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/scryfall.js"></script>
+  <script src="js/deck-validator.js"></script>
+  <script src="js/importer.js"></script>
+  <script src="js/exporter.js"></script>
+  <script src="js/statistics.js"></script>
+  <script src="js/summary.js"></script>
+  <script src="js/collection.js"></script>
+  <script src="js/deckbuilder.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
