@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#4338ca"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Back Card -->
+  <rect x="120" y="100" width="180" height="260" rx="16" fill="#334155" opacity="0.6" transform="rotate(-12 210 230)"/>
+
+  <!-- Front Card -->
+  <rect x="200" y="110" width="190" height="270" rx="16" fill="url(#cardGrad)" stroke="#818cf8" stroke-width="4"/>
+  <rect x="220" y="135" width="150" height="90" rx="8" fill="#1e1b4b"/>
+
+  <!-- Mana Orbs on Front Card -->
+  <circle cx="245" cy="180" r="12" fill="#f8fafc"/>
+  <circle cx="275" cy="180" r="12" fill="#38bdf8"/>
+  <circle cx="305" cy="180" r="12" fill="#64748b"/>
+  <circle cx="335" cy="180" r="12" fill="#ef4444"/>
+  <circle cx="305" cy="210" r="12" fill="#22c55e"/>
+
+  <!-- Lines representing stats/summary -->
+  <line x1="225" y1="245" x2="365" y2="245" stroke="#c7d2fe" stroke-width="6" stroke-linecap="round"/>
+  <line x1="225" y1="265" x2="330" y2="265" stroke="#a5b4fc" stroke-width="6" stroke-linecap="round"/>
+  <line x1="225" y1="285" x2="350" y2="285" stroke="#818cf8" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Gold Star / Emblem -->
+  <circle cx="340" cy="335" r="30" fill="url(#goldGrad)"/>
+  <polygon points="340,317 344,329 357,329 347,337 351,349 340,342 329,349 333,337 323,329 336,329" fill="#ffffff"/>
+</svg>
+
