@@ -732,18 +732,6 @@ body {
     text-shadow: 0 0 8px rgba(252, 77, 80, 0.6);
 }
 
-.social-btn.discord {
-    border-color: rgba(88, 101, 242, 0.5);
-    color: #5865F2;
-    box-shadow: 0 0 10px rgba(88, 101, 242, 0.1);
-}
-
-.social-btn.discord:hover {
-    border-color: #5865F2;
-    box-shadow: 0 0 20px rgba(88, 101, 242, 0.4), inset 0 0 10px rgba(88, 101, 242, 0.2);
-    text-shadow: 0 0 8px rgba(88, 101, 242, 0.6);
-}
-
 .social-btn.youtube {
     border-color: rgba(255, 0, 0, 0.5);
     color: #ff3333;
