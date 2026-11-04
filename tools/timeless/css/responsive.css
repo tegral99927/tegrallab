@@ -1,0 +1,142 @@
+/**
+ * TimeLess - responsive.css
+ * タブレット・スマートフォン向けレスポンシブ対応
+ */
+
+/* タブレット・中画面 (<= 1180px) */
+@media (max-width: 1180px) {
+  .layout-split {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-pane {
+    position: static;
+    order: -1; /* スマホやタブレットでもプレビューを上部に配置して視覚化しやすく */
+    margin-bottom: 20px;
+  }
+}
+
+/* スマホ (<= 768px) */
+@media (max-width: 768px) {
+  .app-header {
+    position: static;
+  }
+
+  .header-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .theme-select-wrapper {
+    flex: 1;
+  }
+
+  .app-main {
+    padding: 16px 12px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .template-selector {
+    width: 100%;
+  }
+
+  .template-selector select {
+    width: 100%;
+  }
+
+  .profile-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .profile-fields {
+    width: 100%;
+  }
+
+  .toolbar-group {
+    justify-content: flex-start;
+  }
+
+  .schedule-grid {
+    grid-template-columns: 48px repeat(7, minmax(40px, 1fr));
+  }
+
+  .time-label-cell {
+    font-size: 0.65rem;
+    height: 26px;
+  }
+
+  .schedule-cell {
+    height: 26px;
+  }
+
+  .ui-charts-container {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .schedule-stats-bar {
+    justify-content: space-between;
+  }
+
+  .stat-pill {
+    flex: 1 1 45%;
+    font-size: 0.72rem;
+  }
+
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .toast {
+    text-align: center;
+  }
+}
+
+/* 極小画面 (<= 420px) */
+@media (max-width: 420px) {
+  .header-back-link .back-link-text {
+    display: none;
+  }
+
+  .header-back-link {
+    padding: 6px 8px;
+  }
+
+  .brand-title {
+    font-size: 1.15rem;
+  }
+
+  .btn {
+    font-size: 0.78rem;
+    padding: 6px 10px;
+  }
+
+  .schedule-grid {
+    min-width: 360px;
+  }
+}
+
