@@ -72,13 +72,17 @@ function drawHeadphoneIcon(ctx, x, y, color, isOff = false) {
 }
 
 /**
- * 複数行テキストの折り返し描画
+ * 複数行テキストの折り返し行配列生成
  */
-function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+function getWrappedLines(ctx, text, maxWidth) {
   const lines = [];
   const paragraphs = text.split('\n');
 
   for (const para of paragraphs) {
+    if (para.length === 0) {
+      lines.push('');
+      continue;
+    }
     let currentLine = '';
     for (let i = 0; i < para.length; i++) {
       const char = para[i];
@@ -87,20 +91,15 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
       if (metrics.width > maxWidth && currentLine.length > 0) {
         lines.push(currentLine);
         currentLine = char;
-        if (lines.length >= maxLines) break;
       } else {
         currentLine = testLine;
       }
     }
-    if (lines.length >= maxLines) break;
-    lines.push(currentLine);
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
   }
-
-  const renderedLines = lines.slice(0, maxLines);
-  for (let i = 0; i < renderedLines.length; i++) {
-    ctx.fillText(renderedLines[i], x, y + i * lineHeight);
-  }
-  return renderedLines.length * lineHeight;
+  return lines;
 }
 
 /**
@@ -177,13 +176,13 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   roundRect(ctx, 24, 24, BASE_W - 48, BASE_H - 48, 20);
   ctx.stroke();
 
-  // 2. ヘッダー描画 (Y: 48〜170)
+  // 2. ヘッダー描画 (Y: 50〜176)
   const headerX = 60;
-  const headerY = 56;
+  const headerY = 50;
   const headerW = BASE_W - 120;
-  const headerH = 120;
+  const headerH = 126;
 
-  const summaryBadgeW = 200;
+  const summaryBadgeW = 230;
   const summaryBadgeX = headerX + headerW - summaryBadgeW - 20;
 
   // ヘッダー背景パネル
@@ -196,7 +195,7 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
 
   // 左側：オリジナルロゴアイコン
   const logoX = headerX + 24;
-  const logoY = headerY + 18;
+  const logoY = headerY + 21;
   const logoSize = 84;
 
   // ロゴ外周円
@@ -232,29 +231,29 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   ctx.fill();
   ctx.restore();
 
-  // ブランドタイトル
+  // ブランドタイトル (太く、大きく)
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  ctx.font = '900 40px "Montserrat", "Inter", sans-serif';
+  ctx.font = '900 44px "Montserrat", "Inter", sans-serif';
   ctx.fillStyle = palette.text;
-  ctx.fillText('TimeLess', logoX + logoSize + 20, headerY + 54);
+  ctx.fillText('TimeLess', logoX + logoSize + 22, headerY + 56);
 
   // サブタイトルバッジ
-  ctx.font = '600 13px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.accent;
-  ctx.fillText('PLAYER AVAILABILITY SCHEDULE', logoX + logoSize + 22, headerY + 84);
+  ctx.fillText('PLAYER AVAILABILITY SCHEDULE', logoX + logoSize + 24, headerY + 86);
 
   // 垂直ディバイダー
   ctx.beginPath();
-  ctx.moveTo(logoX + logoSize + 270, headerY + 24);
-  ctx.lineTo(logoX + logoSize + 270, headerY + headerH - 24);
+  ctx.moveTo(logoX + logoSize + 280, headerY + 24);
+  ctx.lineTo(logoX + logoSize + 280, headerY + headerH - 24);
   ctx.strokeStyle = palette.border;
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // ユーザープロフィールエリア
-  const profX = logoX + logoSize + 300;
-  const avatarSize = 76;
+  const profX = logoX + logoSize + 310;
+  const avatarSize = 80;
   const avatarCenterX = profX + avatarSize / 2;
   const avatarCenterY = headerY + headerH / 2;
 
@@ -285,10 +284,10 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
     ctx.fillRect(profX, avatarCenterY - avatarSize / 2, avatarSize, avatarSize);
     ctx.fillStyle = palette.textMuted;
     ctx.beginPath();
-    ctx.arc(avatarCenterX, avatarCenterY - 8, 16, 0, Math.PI * 2);
+    ctx.arc(avatarCenterX, avatarCenterY - 8, 18, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
-    ctx.arc(avatarCenterX, avatarCenterY + 36, 30, 0, Math.PI * 2);
+    ctx.arc(avatarCenterX, avatarCenterY + 38, 32, 0, Math.PI * 2);
     ctx.fill();
   }
   ctx.restore();
@@ -297,19 +296,19 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   ctx.beginPath();
   ctx.arc(avatarCenterX, avatarCenterY, avatarSize / 2, 0, Math.PI * 2);
   ctx.strokeStyle = palette.accent;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3;
   ctx.stroke();
 
   // ユーザー名 & タイムゾーン & VC設定
-  const nameX = profX + avatarSize + 22;
+  const nameX = profX + avatarSize + 24;
   const playerName = (state.profile?.name && state.profile.name.trim()) ? state.profile.name.trim() : 'Player';
   const tzText = state.profile?.timezone || 'JST (UTC+9)';
 
   // タイムゾーンバッジの横幅を計算
-  ctx.font = '600 14px "Inter", sans-serif';
+  ctx.font = '700 15px "Inter", sans-serif';
   const tzMetrics = ctx.measureText(tzText);
-  const tzBadgeW = tzMetrics.width + 24;
-  const tzBadgeH = 28;
+  const tzBadgeW = tzMetrics.width + 28;
+  const tzBadgeH = 32;
 
   // VCバッジの横幅を計算
   const vcKey = state.profile?.voiceChat || 'ok';
@@ -321,41 +320,41 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
     required: 'VC 必須'
   };
   const vcLabel = vcLabels[vcKey] || 'VC OK';
-  ctx.font = '700 12px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
   const vcMetrics = ctx.measureText(vcLabel);
-  const vcBadgeW = vcMetrics.width + 38;
-  const vcBadgeH = 28;
+  const vcBadgeW = vcMetrics.width + 42;
+  const vcBadgeH = 32;
 
   // ユーザー名のフォントを設定して幅を正確に計測（長い場合は自動縮小して被りを防止）
-  let nameFontSize = 32;
+  let nameFontSize = 36;
   ctx.font = `800 ${nameFontSize}px "Inter", "Noto Sans JP", sans-serif`;
   let nameMetrics = ctx.measureText(playerName);
   const maxAvailableNameWidth = summaryBadgeX - nameX - tzBadgeW - vcBadgeW - 50;
 
-  while (nameMetrics.width > maxAvailableNameWidth && nameFontSize > 18) {
+  while (nameMetrics.width > maxAvailableNameWidth && nameFontSize > 20) {
     nameFontSize -= 2;
     ctx.font = `800 ${nameFontSize}px "Inter", "Noto Sans JP", sans-serif`;
     nameMetrics = ctx.measureText(playerName);
   }
 
-  // ユーザー名の描画
+  // ユーザー名の描画 (大きく太く)
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = palette.text;
-  ctx.fillText(playerName, nameX, headerY + 54);
+  ctx.fillText(playerName, nameX, headerY + 56);
 
-  // タイムゾーンバッジの描画（ユーザー名の末尾から適正な余白を空けて配置）
+  // タイムゾーンバッジの描画
   const tzBadgeX = nameX + nameMetrics.width + 18;
   const tzBadgeY = headerY + 28;
 
-  roundRect(ctx, tzBadgeX, tzBadgeY, tzBadgeW, tzBadgeH, 14);
+  roundRect(ctx, tzBadgeX, tzBadgeY, tzBadgeW, tzBadgeH, 16);
   ctx.fillStyle = palette.panelSub;
   ctx.fill();
   ctx.strokeStyle = palette.border;
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  ctx.font = '600 14px "Inter", sans-serif';
+  ctx.font = '700 15px "Inter", sans-serif';
   ctx.fillStyle = palette.accent;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -365,56 +364,57 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   const vcBadgeX = tzBadgeX + tzBadgeW + 10;
   const vcBadgeY = headerY + 28;
 
-  roundRect(ctx, vcBadgeX, vcBadgeY, vcBadgeW, vcBadgeH, 14);
+  roundRect(ctx, vcBadgeX, vcBadgeY, vcBadgeW, vcBadgeH, 16);
   const isVcActive = ['ok', 'required'].includes(vcKey);
   const isVcNgo = vcKey === 'ng';
 
-  ctx.fillStyle = isVcActive ? `rgba(${palette.accentRgb}, 0.12)` : palette.panelSub;
+  ctx.fillStyle = isVcActive ? `rgba(${palette.accentRgb}, 0.14)` : palette.panelSub;
   ctx.fill();
   ctx.strokeStyle = isVcActive ? palette.accent : (isVcNgo ? palette.gridLine : palette.border);
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // ヘッドフォンアイコン描画
-  drawHeadphoneIcon(ctx, vcBadgeX + 10, vcBadgeY + 7, isVcActive ? palette.accent : (isVcNgo ? palette.textMuted : palette.text), isVcNgo);
+  drawHeadphoneIcon(ctx, vcBadgeX + 11, vcBadgeY + 9, isVcActive ? palette.accent : (isVcNgo ? palette.textMuted : palette.text), isVcNgo);
 
   // VCテキスト描画
-  ctx.font = '700 12px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = isVcActive ? palette.accent : (isVcNgo ? palette.textMuted : palette.text);
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(vcLabel, vcBadgeX + 28, vcBadgeY + vcBadgeH / 2);
+  ctx.fillText(vcLabel, vcBadgeX + 32, vcBadgeY + vcBadgeH / 2);
 
-  // プロフィールコメント（任意）
+  // プロフィールコメント（大きく・高コントラスト）
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   if (state.profile?.comment && state.profile.comment.trim()) {
-    ctx.font = '500 16px "Noto Sans JP", sans-serif';
-    ctx.fillStyle = palette.textMuted;
-    ctx.fillText(state.profile.comment.trim(), nameX, headerY + 90);
+    ctx.font = '600 18px "Noto Sans JP", sans-serif';
+    ctx.fillStyle = palette.text;
+    ctx.fillText(state.profile.comment.trim(), nameX, headerY + 96);
   }
 
   // ヘッダー右端：総合アクティブ時間サマリーバッジ
   const totalHours = scheduleManager.getTotalHours();
-  roundRect(ctx, summaryBadgeX, headerY + 20, summaryBadgeW, headerH - 40, 12);
+  roundRect(ctx, summaryBadgeX, headerY + 16, summaryBadgeW, headerH - 32, 12);
   ctx.fillStyle = palette.panelSub;
   ctx.fill();
   ctx.strokeStyle = palette.border;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
   ctx.textAlign = 'center';
-  ctx.font = '600 12px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.textMuted;
-  ctx.fillText('週間合計活動可能', summaryBadgeX + summaryBadgeW / 2, headerY + 48);
+  ctx.fillText('週間合計活動可能', summaryBadgeX + summaryBadgeW / 2, headerY + 46);
 
-  ctx.font = '800 28px "Inter", sans-serif';
+  ctx.font = '900 32px "Inter", sans-serif';
   ctx.fillStyle = palette.accent;
-  ctx.fillText(`${totalHours} 時間`, summaryBadgeX + summaryBadgeW / 2, headerY + 84);
+  ctx.fillText(`${totalHours} 時間`, summaryBadgeX + summaryBadgeW / 2, headerY + 86);
 
   // 3. メインエリア配置
-  // メインエリア高さ: 1040px (Y: 196〜1236)
-  const mainY = 196;
-  const mainH = 1040;
+  // メインエリア高さ: 1024px (Y: 194〜1218)
+  const mainY = 194;
+  const mainH = 1024;
 
   // 左側：週間スケジュールテーブル (幅 1600px)
   const schedW = 1600;
@@ -422,13 +422,13 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   drawScheduleTable(ctx, schedX, mainY, schedW, mainH, scheduleManager, palette);
 
   // 右側：円グラフ早見表 ＆ 環境・フォーマット表示 (幅 800px)
-  const rightX = schedX + schedW + 40;
-  const rightW = headerW - schedW - 40;
+  const rightX = schedX + schedW + 36;
+  const rightW = headerW - schedW - 36;
   await drawRightPanel(ctx, rightX, mainY, rightW, mainH, state, scheduleManager, palette);
 
-  // 4. フッターエリア (Y: 1256〜1396)
-  const footerY = 1256;
-  const footerH = 130;
+  // 4. フッターエリア (Y: 1236〜1388, 高さ 152px)
+  const footerY = 1236;
+  const footerH = 152;
   drawFooter(ctx, headerX, footerY, headerW, footerH, state, scheduleManager, palette);
 
   ctx.restore();
@@ -453,11 +453,11 @@ function drawScheduleTable(ctx, x, y, width, height, scheduleManager, palette) {
   const innerH = height - pad * 2;
 
   // テーブル寸法
-  const timeColW = 68; // 時間軸ラベル列
+  const timeColW = 76; // 時間軸ラベル列
   const dayColW = (innerW - timeColW) / 7;
-  const headerRowH = 50; // 曜日ヘッダー
+  const headerRowH = 52; // 曜日ヘッダー
   const gridH = innerH - headerRowH;
-  const rowH = gridH / 24; // 24時間各行の高さ (約38px)
+  const rowH = gridH / 24; // 24時間各行の高さ (約37.5px)
 
   // 曜日ヘッダー描画
   for (let d = 0; d < 7; d++) {
@@ -465,24 +465,24 @@ function drawScheduleTable(ctx, x, y, width, height, scheduleManager, palette) {
     const isWeekend = d >= 5;
 
     roundRect(ctx, dx + 3, innerY, dayColW - 6, headerRowH - 6, 8);
-    ctx.fillStyle = isWeekend ? (palette.panelSub) : palette.panelSub;
+    ctx.fillStyle = palette.panelSub;
     ctx.fill();
     ctx.strokeStyle = isWeekend ? palette.accent : palette.border;
-    ctx.lineWidth = isWeekend ? 1.5 : 1;
+    ctx.lineWidth = isWeekend ? 2 : 1;
     ctx.stroke();
 
-    // 曜日テキスト
+    // 曜日テキスト (太く、大きく)
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.font = '700 15px "Inter", "Noto Sans JP", sans-serif';
+    ctx.font = '800 16px "Inter", "Noto Sans JP", sans-serif';
     ctx.fillStyle = isWeekend ? palette.accent : palette.text;
     ctx.fillText(`${DAY_NAMES[d]} (${DAY_NAMES_EN[d]})`, dx + dayColW / 2, innerY + 18);
 
     // 曜日の活動可能時間バッジ
     const dayH = scheduleManager.getDayHours(d);
-    ctx.font = '600 11px "Inter", sans-serif';
+    ctx.font = '700 13px "Inter", sans-serif';
     ctx.fillStyle = dayH > 0 ? palette.accent : palette.textMuted;
-    ctx.fillText(`${dayH}h`, dx + dayColW / 2, innerY + 34);
+    ctx.fillText(`${dayH}h`, dx + dayColW / 2, innerY + 35);
   }
 
   // 時間軸ラベル & グリッドセル描画
@@ -495,14 +495,19 @@ function drawScheduleTable(ctx, x, y, width, height, scheduleManager, palette) {
     // 6時間ごとのガイドハイライト背景
     if (h % 6 === 0) {
       ctx.fillStyle = palette.gridLine;
-      ctx.globalAlpha = 0.25;
+      ctx.globalAlpha = 0.35;
       ctx.fillRect(innerX, ry, innerW, rowH);
       ctx.globalAlpha = 1.0;
     }
 
-    // 時間ラベル
-    ctx.font = '600 12px "Inter", sans-serif';
-    ctx.fillStyle = (h % 6 === 0) ? palette.accent : palette.textMuted;
+    // 時間ラベル (太く鮮明に)
+    if (h % 6 === 0) {
+      ctx.font = '800 15px "Inter", sans-serif';
+      ctx.fillStyle = palette.accent;
+    } else {
+      ctx.font = '700 13px "Inter", sans-serif';
+      ctx.fillStyle = palette.text;
+    }
     ctx.fillText(`${h}:00`, innerX + timeColW - 12, ry + rowH / 2);
 
     // 7日分のセル
@@ -539,8 +544,8 @@ function drawScheduleTable(ctx, x, y, width, height, scheduleManager, palette) {
   }
 
   // グリッド下端の24:00ラインラベル
-  ctx.font = '600 11px "Inter", sans-serif';
-  ctx.fillStyle = palette.textMuted;
+  ctx.font = '800 14px "Inter", sans-serif';
+  ctx.fillStyle = palette.accent;
   ctx.fillText('24:00', innerX + timeColW - 12, innerY + headerRowH + gridH);
 }
 
@@ -570,16 +575,16 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // グラフカードタイトル
+  // グラフカードタイトル (太く、大きく)
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  ctx.font = '700 18px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '800 20px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.text;
-  ctx.fillText('24時間 活動帯早見表', innerX + 18, innerY + 34);
+  ctx.fillText('24時間 活動帯早見表', innerX + 20, innerY + 36);
 
-  ctx.font = '500 12px "Noto Sans JP", sans-serif';
+  ctx.font = '600 14px "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.textMuted;
-  ctx.fillText('色の濃さ＝選択日数率 (平日: /5日, 休日: /2日)', innerX + 18, innerY + 54);
+  ctx.fillText('色の濃さ＝選択日数率 (平日: /5日, 休日: /2日)', innerX + 20, innerY + 58);
 
   // 2つのリンググラフ（平日 & 休日）
   const chartY = innerY + 230;
@@ -601,7 +606,7 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
     data: weekdayData,
     averageHours: `${weekdayAvg}h`,
     palette,
-    scale: 1.15
+    scale: 1.22
   });
 
   // 2. 休日グラフ
@@ -619,19 +624,19 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
     data: weekendData,
     averageHours: `${weekendAvg}h`,
     palette,
-    scale: 1.15
+    scale: 1.22
   });
 
   // グラフ凡例バー（下部）
   const legendY = innerY + chartsH - 36;
   ctx.textAlign = 'left';
-  ctx.font = '500 12px "Noto Sans JP", sans-serif';
-  ctx.fillStyle = palette.textMuted;
-  ctx.fillText('選択率: 0%', innerX + 30, legendY + 12);
+  ctx.font = '700 14px "Noto Sans JP", sans-serif';
+  ctx.fillStyle = palette.text;
+  ctx.fillText('選択率: 0%', innerX + 26, legendY + 12);
 
   // グラデーションバー
-  const barX = innerX + 110;
-  const barW = innerW - 220;
+  const barX = innerX + 116;
+  const barW = innerW - 232;
   const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
   grad.addColorStop(0, palette.track);
   grad.addColorStop(1, palette.accent);
@@ -652,11 +657,11 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  // タイトル
+  // タイトル (太く、大きく)
   ctx.textAlign = 'left';
-  ctx.font = '700 18px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '800 20px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.text;
-  ctx.fillText('対応プレイ環境 & フォーマット', innerX + 18, envY + 34);
+  ctx.fillText('対応プレイ環境 & フォーマット', innerX + 20, envY + 36);
 
   // 環境カードリスト
   const envKeys = ['paper', 'arena', 'mo'];
@@ -677,40 +682,40 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
     ctx.lineWidth = isEnabled ? 1.5 : 1;
     ctx.stroke();
 
-    // 環境アイコン & ラベル
+    // 環境アイコン & ラベル (太く、大きく)
     ctx.textAlign = 'left';
-    ctx.font = '700 16px "Inter", "Noto Sans JP", sans-serif';
+    ctx.font = '800 18px "Inter", "Noto Sans JP", sans-serif';
     ctx.fillStyle = isEnabled ? palette.accent : palette.textMuted;
 
     // 独自抽象アイコン描画
     drawEnvIcon(ctx, cardX + 14, curEnvY + 14, env.id, isEnabled, palette);
 
-    ctx.fillText(env.name, cardX + 46, curEnvY + 28);
+    ctx.fillText(env.name, cardX + 48, curEnvY + 30);
 
     // 状態インジケーター
-    ctx.font = '600 11px "Inter", sans-serif';
+    ctx.font = '700 12px "Inter", sans-serif';
     const statusText = isEnabled ? 'READY' : 'OFF';
     const stMetrics = ctx.measureText(statusText);
-    roundRect(ctx, cardX + cardW - stMetrics.width - 24, curEnvY + 12, stMetrics.width + 16, 20, 10);
+    roundRect(ctx, cardX + cardW - stMetrics.width - 24, curEnvY + 12, stMetrics.width + 16, 22, 11);
     ctx.fillStyle = isEnabled ? `rgba(${palette.accentRgb}, 0.2)` : palette.panelSub;
     ctx.fill();
     ctx.fillStyle = isEnabled ? palette.accent : palette.textMuted;
-    ctx.fillText(statusText, cardX + cardW - stMetrics.width - 16, curEnvY + 26);
+    ctx.fillText(statusText, cardX + cardW - stMetrics.width - 16, curEnvY + 27);
 
-    // フォーマットタグ一覧
+    // フォーマットタグ一覧 (太く、大きく、視認性強化)
     const formats = (env.formats || []).concat(state.customFormats || []);
     let tagX = cardX + 14;
     let tagY = curEnvY + 52;
-    const tagH = 26;
+    const tagH = 30;
 
     if (formats.length === 0 || !isEnabled) {
-      ctx.font = '400 13px "Noto Sans JP", sans-serif';
+      ctx.font = '600 14px "Noto Sans JP", sans-serif';
       ctx.fillStyle = palette.textMuted;
-      ctx.fillText(isEnabled ? 'フォーマット未設定' : '現在非対応', tagX, tagY + 16);
+      ctx.fillText(isEnabled ? 'フォーマット未設定' : '現在非対応', tagX, tagY + 18);
     } else {
       formats.slice(0, 7).forEach(fmt => {
-        ctx.font = '600 12px "Inter", sans-serif';
-        const tw = ctx.measureText(fmt).width + 18;
+        ctx.font = '700 14px "Inter", sans-serif';
+        const tw = ctx.measureText(fmt).width + 20;
         if (tagX + tw > cardX + cardW - 14) {
           tagX = cardX + 14;
           tagY += tagH + 8;
@@ -724,7 +729,7 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
         ctx.stroke();
 
         ctx.fillStyle = isEnabled ? palette.text : palette.textMuted;
-        ctx.fillText(fmt, tagX + 9, tagY + 18);
+        ctx.fillText(fmt, tagX + 10, tagY + 20);
 
         tagX += tw + 8;
       });
@@ -741,7 +746,7 @@ function drawEnvIcon(ctx, x, y, id, isEnabled, palette) {
   ctx.save();
   ctx.strokeStyle = isEnabled ? palette.accent : palette.textMuted;
   ctx.fillStyle = isEnabled ? palette.accent : palette.textMuted;
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.6;
 
   if (id === 'paper') {
     // 抽象カード2枚の重ね合わせ
@@ -778,13 +783,19 @@ function drawEnvIcon(ctx, x, y, id, isEnabled, palette) {
 
 /**
  * フッターエリア（補足メモ ＆ 補助ラベル・カラー凡例）
+ * ※補足メモの内容が絶対に途切れず、100%全行画像内に収まるアダプティブレイアウト
  */
 function drawFooter(ctx, x, y, width, height, state, scheduleManager, palette) {
   const hasNotes = Boolean(state.notes && state.notes.trim());
 
+  // 右側：カラー凡例 ＆ クレジット（幅440px）
+  const infoW = 440;
+  const infoX = hasNotes ? (x + width - infoW) : x;
+  const finalInfoW = hasNotes ? infoW : width;
+
   // メモ欄（存在する場合）
   if (hasNotes) {
-    const memoW = width - 420;
+    const memoW = width - infoW - 20;
     roundRect(ctx, x, y, memoW, height, 12);
     ctx.fillStyle = palette.panel;
     ctx.fill();
@@ -792,64 +803,105 @@ function drawFooter(ctx, x, y, width, height, state, scheduleManager, palette) {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // メモヘッダー
+    // メモヘッダー (太く、大きく)
     ctx.textAlign = 'left';
     ctx.textBaseline = 'alphabetic';
-    ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
+    ctx.font = '800 17px "Inter", "Noto Sans JP", sans-serif';
     ctx.fillStyle = palette.accent;
-    ctx.fillText('■ 補足メモ / コメント', x + 20, y + 28);
+    ctx.fillText('■ 補足メモ / コメント', x + 24, y + 30);
 
-    // メモ本文（複数行対応・自動折り返し）
-    ctx.font = '500 15px "Noto Sans JP", sans-serif';
+    // メモ本文の自動レイアウト（全行を必ず収める）
     ctx.fillStyle = palette.text;
-    wrapText(ctx, state.notes.trim(), x + 20, y + 54, memoW - 40, 24, 3);
+    const rawText = state.notes.trim();
+    const availableW = memoW - 48;
+    const startY = y + 56;
+    const maxAvailableH = (y + height - 12) - startY;
+
+    let baseFontSize = 16;
+    let lineHeight = 24;
+    ctx.font = `600 ${baseFontSize}px "Noto Sans JP", sans-serif`;
+    let singleLines = getWrappedLines(ctx, rawText, availableW);
+
+    if (singleLines.length <= 4) {
+      // 4行以内なら1列でゆったり描画
+      for (let i = 0; i < singleLines.length; i++) {
+        ctx.fillText(singleLines[i], x + 24, startY + i * lineHeight);
+      }
+    } else {
+      // 5行以上なら2列に分割して全行を画像内に収める
+      const colGap = 40;
+      const colW = (availableW - colGap) / 2;
+      let colLines = getWrappedLines(ctx, rawText, colW);
+      let perCol = Math.ceil(colLines.length / 2);
+
+      // 行数が多い場合、枠内に必ず100%収まるよう行高とフォントサイズを動的調整
+      if (perCol * lineHeight > maxAvailableH) {
+        lineHeight = Math.max(16, Math.floor(maxAvailableH / perCol));
+        baseFontSize = Math.max(12, Math.floor(lineHeight * 0.7));
+        ctx.font = `600 ${baseFontSize}px "Noto Sans JP", sans-serif`;
+        colLines = getWrappedLines(ctx, rawText, colW);
+        perCol = Math.ceil(colLines.length / 2);
+      }
+
+      const col1 = colLines.slice(0, perCol);
+      const col2 = colLines.slice(perCol);
+
+      for (let i = 0; i < col1.length; i++) {
+        ctx.fillText(col1[i], x + 24, startY + i * lineHeight);
+      }
+      for (let i = 0; i < col2.length; i++) {
+        ctx.fillText(col2[i], x + 24 + colW + colGap, startY + i * lineHeight);
+      }
+    }
   }
 
-  // 右側：カラー凡例 ＆ クレジット
-  const infoX = hasNotes ? (x + width - 390) : x;
-  const infoW = hasNotes ? 390 : width;
-
-  roundRect(ctx, infoX, y, infoW, height, 12);
+  // 右側：凡例＆ステータスカード描画 (太く、大きく、高コントラスト)
+  roundRect(ctx, infoX, y, finalInfoW, height, 12);
   ctx.fillStyle = palette.panel;
   ctx.fill();
   ctx.strokeStyle = palette.border;
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
-  // 凡例表示
   const pad = 24;
-  const legendY = y + 34;
+  const legendY = y + 36;
 
   // アクティブ凡例
-  roundRect(ctx, infoX + pad, legendY - 12, 18, 18, 4);
+  roundRect(ctx, infoX + pad, legendY - 14, 20, 20, 5);
   ctx.fillStyle = palette.accent;
   ctx.fill();
 
   ctx.textAlign = 'left';
-  ctx.font = '600 13px "Inter", "Noto Sans JP", sans-serif';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = '700 15px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.text;
-  ctx.fillText('対戦可能 (Available)', infoX + pad + 26, legendY + 2);
+  ctx.fillText('対戦可能 (Available)', infoX + pad + 28, legendY + 2);
 
   // 非アクティブ凡例
-  roundRect(ctx, infoX + pad + 180, legendY - 12, 18, 18, 4);
+  roundRect(ctx, infoX + pad + 200, legendY - 14, 20, 20, 5);
   ctx.fillStyle = palette.track;
   ctx.fill();
   ctx.strokeStyle = palette.gridLine;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
 
+  ctx.font = '700 15px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.textMuted;
-  ctx.fillText('対戦不可', infoX + pad + 206, legendY + 2);
+  ctx.fillText('対戦不可', infoX + pad + 228, legendY + 2);
 
   // 最多活動時間帯
   const peak = scheduleManager.getPeakHourRange();
-  ctx.font = '500 13px "Noto Sans JP", sans-serif';
-  ctx.fillStyle = palette.textMuted;
+  ctx.font = '700 15px "Inter", "Noto Sans JP", sans-serif';
+  ctx.fillStyle = palette.text;
   const peakLabel = peak.allEmpty ? '未設定' : `${peak.label} (最多)`;
-  ctx.fillText(`ピーク時間帯: ${peakLabel}`, infoX + pad, y + 74);
+  ctx.fillText('ピーク時間帯: ', infoX + pad, y + 82);
+  ctx.fillStyle = palette.accent;
+  const peakLabelOffset = ctx.measureText('ピーク時間帯: ').width;
+  ctx.fillText(peakLabel, infoX + pad + peakLabelOffset, y + 82);
 
   // クレジット & 非公式表記
-  ctx.font = '500 11px "Inter", "Noto Sans JP", sans-serif';
+  ctx.font = '600 13px "Inter", "Noto Sans JP", sans-serif';
   ctx.fillStyle = palette.textMuted;
-  ctx.fillText('TimeLess • Independent & Unofficial Match Availability Generator', infoX + pad, y + 106);
+  ctx.fillText('TimeLess • Unofficial Match Availability Schedule', infoX + pad, y + 120);
 }
 
