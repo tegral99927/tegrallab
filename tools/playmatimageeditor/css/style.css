@@ -70,6 +70,42 @@ body {
   z-index: 100;
 }
 
+.header-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-panel-header);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.header-back-link:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+.header-back-link svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .header-back-link .back-link-text {
+    display: none;
+  }
+  .header-back-link {
+    padding: 5px 8px;
+  }
+}
+
 .brand {
   display: flex;
   align-items: center;

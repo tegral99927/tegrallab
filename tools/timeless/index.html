@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="midnight">
+
+<head>
+  <!-- Google Analytics (Tegral Lab Common) -->
+  <script src="/asset/js/gtag.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TimeLess | プレイヤー活動可能時間 週間スケジュール画像ジェネレーター【無料・登録不要】</title>
+
+  <!-- SEO Meta -->
+  <meta name="description"
+    content="MTG（マジック：ザ・ギャザリング）リモート対戦、Arena、Magic Online、Commander（統率者戦）などの対戦相手募集用週間スケジュール画像作成ツール。平日・休日の活動可能時間を視覚化し、DiscordやSNSで共有できる洗練された16:9高解像度画像をブラウザ完結・完全無料で生成。">
+  <meta name="keywords" content="対戦相手募集, スケジュール画像, MTG, マジックザギャザリング, リモート対戦, SpellTable, Commander, 統率者戦, Discord募集, 活動可能時間, 週間スケジュール, カードゲーム, TimeLess, Tegral Lab">
+  <meta name="author" content="Tegral Lab">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://tegrallab.com/tools/timeless/">
+
+  <!-- Favicons & Icons -->
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/tools/timeless/icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/tools/timeless/icon.png">
+
+  <!-- Open Graph Protocol (OGP) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TimeLess (Tegral Lab)">
+  <meta property="og:title" content="TimeLess | プレイヤー活動可能時間 週間スケジュール画像ジェネレーター">
+  <meta property="og:description" content="対戦可能時間をサクッと入力して、DiscordやSNSで共有できる洗練された16:9スケジュール画像を無料作成！登録不要・完全ローカル動作。">
+  <meta property="og:url" content="https://tegrallab.com/tools/timeless/">
+  <meta property="og:image" content="https://tegrallab.com/tools/timeless/icon.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="TimeLess | プレイヤー活動可能時間 週間スケジュール画像ジェネレーター">
+  <meta name="twitter:description" content="対戦可能時間をサクッと入力して、DiscordやSNSで共有できる洗練された16:9スケジュール画像を無料作成！登録不要・完全ローカル動作。">
+  <meta name="twitter:image" content="https://tegrallab.com/tools/timeless/icon.png">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "TimeLess",
+    "alternateName": "タイムレス",
+    "url": "https://tegrallab.com/tools/timeless/",
+    "description": "MTGリモート対戦、Arena、Magic Online、Commander（統率者戦）などの対戦相手募集用週間スケジュール画像ジェネレーター。平日・休日の活動可能時間を視覚化し、DiscordやSNSで共有できる16:9高解像度画像を完全無料で即座に作成できます。",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript and HTML5 Canvas support",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Tegral Lab",
+      "url": "https://tegrallab.com/"
+    },
+    "featureList": [
+      "7日×24時間（168セル）の直感的なドラッグ＆タッチスケジュール編集",
+      "平日（月〜金）および休日（土日）の24時間リンググラフ早見表（選択日数率算出）",
+      "紙・リモート、Arena、Magic Online等のプレイ環境および主要フォーマット選択",
+      "16:9比率（2560×1440 2K等）の高解像度画像出力・クリップボード直接コピー",
+      "5色のカラーテーマ切り替え（Midnight Blue, Emerald, Violet, Monochrome, Light Minimal）",
+      "サーバー通信なし・完全ブラウザ完結のローカル動作・プライバシー保護"
+    ]
+  }
+  </script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+  <!-- アプリヘッダー -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <a href="/pages/tools.html" class="header-back-link" title="ツール一覧に戻る" aria-label="ツール一覧に戻る">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span class="back-link-text">ツール一覧</span>
+        </a>
+        <img src="assets/icons/logo.svg" alt="TimeLess Logo" class="brand-logo" width="36" height="36">
+        <div class="brand-text">
+          <h1 class="brand-title">TimeLess</h1>
+          <span class="brand-tag">Weekly Match Availability</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- テーマ切り替え -->
+        <div class="theme-select-wrapper">
+          <label for="themeSelect" class="sr-only">カラーテーマ</label>
+          <select id="themeSelect" class="select-input" aria-label="カラーテーマ選択">
+            <option value="midnight">Midnight Blue (標準)</option>
+            <option value="emerald">Emerald</option>
+            <option value="violet">Violet</option>
+            <option value="monochrome">Monochrome</option>
+            <option value="light">Light Minimal</option>
+          </select>
+        </div>
+
+        <!-- データ管理ボタン -->
+        <button id="btnExportJSON" class="btn btn-secondary btn-sm" title="設定データをJSONファイルとして保存">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+          </svg>
+          エクスポート
+        </button>
+
+        <label for="importFile" class="btn btn-secondary btn-sm" title="保存したJSON設定を読み込み">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+          </svg>
+          インポート
+        </label>
+        <input type="file" id="importFile" accept=".json,application/json" class="sr-only">
+
+        <button id="btnResetAll" class="btn btn-danger btn-sm" title="すべての設定を初期状態に戻す">
+          初期化
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="app-main">
+    <div class="container layout-split">
+
+      <!-- 左側：編集パネル -->
+      <section class="editor-pane" aria-label="スケジュール・プロフィール編集">
+
+        <!-- 1. プロフィール設定 -->
+        <div class="card panel-section">
+          <div class="section-header">
+            <h2 class="section-title">
+              <span class="step-num">1</span> ユーザープロフィール
+            </h2>
+          </div>
+
+          <div class="profile-grid">
+            <!-- アイコン設定 -->
+            <div class="avatar-col">
+              <div class="avatar-preview-wrapper" id="avatarDropZone">
+                <img id="avatarPreview" src="assets/icons/default-avatar.svg" alt="ユーザーアイコン" class="avatar-img">
+                <label for="avatarInput" class="avatar-upload-overlay" title="アイコン画像を変更">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  <span>変更</span>
+                </label>
+                <input type="file" id="avatarInput" accept="image/png,image/jpeg,image/webp" class="sr-only">
+              </div>
+
+              <!-- アイコン微調整コントロール -->
+              <div class="avatar-controls" id="avatarControls" style="display: none;">
+                <div class="control-row">
+                  <label for="avatarZoom">拡大率</label>
+                  <input type="range" id="avatarZoom" min="1" max="3" step="0.05" value="1">
+                </div>
+                <button type="button" id="btnResetAvatar" class="btn btn-text btn-xs">デフォルトに戻す</button>
+              </div>
+            </div>
+
+            <!-- 名前・タイムゾーン・コメント -->
+            <div class="profile-fields">
+              <div class="form-group">
+                <label for="userName">ユーザー名 <span class="required">*</span></label>
+                <input type="text" id="userName" class="text-input" placeholder="例: Player" maxlength="30" value="Player">
+              </div>
+
+              <div class="form-group">
+                <label for="userTimezone">タイムゾーン</label>
+                <select id="userTimezone" class="select-input">
+                  <option value="JST (UTC+9)" selected>日本標準時 - JST (UTC+9)</option>
+                  <option value="UTC">世界協定時 - UTC</option>
+                  <option value="PST (UTC-8)">米国太平洋 - PST (UTC-8)</option>
+                  <option value="EST (UTC-5)">米国東部 - EST (UTC-5)</option>
+                  <option value="CST (UTC+8)">中国 / 台湾 - CST (UTC+8)</option>
+                  <option value="KST (UTC+9)">韓国 - KST (UTC+9)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="userComment">一言コメント <span class="text-muted">(任意・最大60文字)</span></label>
+                <input type="text" id="userComment" class="text-input" placeholder="例: 夜メインで活動中！Discord通話OK" maxlength="60">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 週間スケジュール編集 -->
+        <div class="card panel-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                <span class="step-num">2</span> 週間対戦可能スケジュール
+              </h2>
+              <p class="section-desc">クリックまたはドラッグで時間帯を選択（月曜〜日曜 / 0:00〜24:00）</p>
+            </div>
+
+            <!-- テンプレート選択 -->
+            <div class="template-selector">
+              <label for="templateSelect" class="sr-only">テンプレート</label>
+              <select id="templateSelect" class="select-input select-sm">
+                <option value="" disabled selected>テンプレートから選ぶ</option>
+                <option value="weekday_night">平日夜型 (19:00〜24:00)</option>
+                <option value="weekend_focus">休日中心 (土日メイン)</option>
+                <option value="late_night">深夜型 (22:00〜翌4:00)</option>
+                <option value="daily_free">毎日自由設定 (昼・夜)</option>
+                <option value="clear">全クリア</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 一括操作ツールバー -->
+          <div class="schedule-toolbar">
+            <div class="toolbar-group">
+              <span class="toolbar-label">一括選択:</span>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnSelectWeekdays">平日全選択</button>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnClearWeekdays">平日全解除</button>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnSelectWeekends">休日全選択</button>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnClearWeekends">休日全解除</button>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnSelectAll">全選択</button>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnClearAll">全解除</button>
+            </div>
+
+            <!-- 時間帯プリセット -->
+            <div class="toolbar-group">
+              <span class="toolbar-label">よく使う時間帯:</span>
+              <button type="button" class="btn btn-preset btn-xs" data-block="morning" title="朝: 6:00〜12:00">朝 (6-12)</button>
+              <button type="button" class="btn btn-preset btn-xs" data-block="afternoon" title="昼: 12:00〜18:00">昼 (12-18)</button>
+              <button type="button" class="btn btn-preset btn-xs" data-block="night" title="夜: 18:00〜24:00">夜 (18-24)</button>
+              <button type="button" class="btn btn-preset btn-xs" data-block="midnight" title="深夜: 0:00〜6:00">深夜 (0-6)</button>
+            </div>
+
+            <!-- コピー＆ペースト -->
+            <div class="toolbar-group">
+              <span class="toolbar-label">曜日の複製:</span>
+              <select id="copySourceDay" class="select-input select-xs" aria-label="コピー元曜日">
+                <option value="0">月曜日を</option>
+                <option value="1">火曜日を</option>
+                <option value="2">水曜日を</option>
+                <option value="3">木曜日を</option>
+                <option value="4">金曜日を</option>
+                <option value="5">土曜日を</option>
+                <option value="6">日曜日を</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnCopyDay">コピー</button>
+              <select id="pasteTargetDay" class="select-input select-xs" aria-label="貼り付け先曜日">
+                <option value="0">月曜日に</option>
+                <option value="1">火曜日に</option>
+                <option value="2">水曜日に</option>
+                <option value="3">木曜日に</option>
+                <option value="4">金曜日に</option>
+                <option value="5">土曜日に</option>
+                <option value="6">日曜日に</option>
+              </select>
+              <button type="button" class="btn btn-secondary btn-xs" id="btnPasteDay">貼り付け</button>
+            </div>
+          </div>
+
+          <!-- 7x24 スケジュールグリッド -->
+          <div class="schedule-grid-container" id="scheduleContainer">
+            <div class="schedule-grid" id="scheduleGrid" role="grid" aria-label="7日間24時間スケジュールグリッド">
+              <!-- JSによって動的生成 -->
+            </div>
+          </div>
+
+          <!-- スケジュール集計サマリー -->
+          <div class="schedule-stats-bar" id="statsBar">
+            <div class="stat-pill">
+              <span class="stat-name">週間合計:</span>
+              <strong class="stat-val" id="statWeeklyTotal">0h</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-name">平日合計:</span>
+              <strong class="stat-val" id="statWeekdayTotal">0h</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-name">休日合計:</span>
+              <strong class="stat-val" id="statWeekendTotal">0h</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-name">ピーク曜日:</span>
+              <strong class="stat-val" id="statPeakDay">-</strong>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-name">最多時間帯:</span>
+              <strong class="stat-val" id="statPeakHour">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 対応プレイ環境・フォーマット -->
+        <div class="card panel-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                <span class="step-num">3</span> 対応プレイ環境 & フォーマット
+              </h2>
+              <p class="section-desc">募集したい環境・フォーマットにチェックを入れてください</p>
+            </div>
+          </div>
+
+          <div class="env-configs" id="envConfigs">
+            <!-- 紙・リモート -->
+            <div class="env-box" data-env="paper">
+              <div class="env-box-header">
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="env_paper" checked>
+                  <span class="checkmark"></span>
+                  <span class="env-title">紙・リモート (Paper / Remote)</span>
+                </label>
+              </div>
+              <div class="format-tags-wrap" id="formats_paper">
+                <label class="format-tag"><input type="checkbox" value="Commander" checked><span>Commander</span></label>
+                <label class="format-tag"><input type="checkbox" value="Modern" checked><span>Modern</span></label>
+                <label class="format-tag"><input type="checkbox" value="Pioneer"><span>Pioneer</span></label>
+                <label class="format-tag"><input type="checkbox" value="Standard"><span>Standard</span></label>
+                <label class="format-tag"><input type="checkbox" value="Legacy"><span>Legacy</span></label>
+                <label class="format-tag"><input type="checkbox" value="Pauper"><span>Pauper</span></label>
+                <label class="format-tag"><input type="checkbox" value="Vintage"><span>Vintage</span></label>
+              </div>
+            </div>
+
+            <!-- MTG Arena -->
+            <div class="env-box" data-env="arena">
+              <div class="env-box-header">
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="env_arena" checked>
+                  <span class="checkmark"></span>
+                  <span class="env-title">Arena</span>
+                </label>
+              </div>
+              <div class="format-tags-wrap" id="formats_arena">
+                <label class="format-tag"><input type="checkbox" value="Standard" checked><span>Standard</span></label>
+                <label class="format-tag"><input type="checkbox" value="Explorer" checked><span>Explorer</span></label>
+                <label class="format-tag"><input type="checkbox" value="Historic"><span>Historic</span></label>
+                <label class="format-tag"><input type="checkbox" value="Timeless"><span>Timeless</span></label>
+                <label class="format-tag"><input type="checkbox" value="Brawl"><span>Brawl</span></label>
+              </div>
+            </div>
+
+            <!-- Magic Online -->
+            <div class="env-box" data-env="mo">
+              <div class="env-box-header">
+                <label class="custom-checkbox">
+                  <input type="checkbox" id="env_mo">
+                  <span class="checkmark"></span>
+                  <span class="env-title">Magic Online</span>
+                </label>
+              </div>
+              <div class="format-tags-wrap" id="formats_mo">
+                <label class="format-tag"><input type="checkbox" value="Pauper" checked><span>Pauper</span></label>
+                <label class="format-tag"><input type="checkbox" value="Legacy" checked><span>Legacy</span></label>
+                <label class="format-tag"><input type="checkbox" value="Modern"><span>Modern</span></label>
+                <label class="format-tag"><input type="checkbox" value="Vintage"><span>Vintage</span></label>
+                <label class="format-tag"><input type="checkbox" value="Commander"><span>Commander</span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- カスタムフォーマット自由追加 -->
+          <div class="custom-format-row">
+            <label for="customFormatInput" class="custom-format-label">自由追加フォーマット:</label>
+            <div class="input-with-button">
+              <input type="text" id="customFormatInput" class="text-input" placeholder="例: Premodern, パウパー統率者" maxlength="20">
+              <button type="button" id="btnAddCustomFormat" class="btn btn-secondary btn-sm">追加</button>
+            </div>
+            <div class="custom-format-list" id="customFormatList"></div>
+          </div>
+        </div>
+
+        <!-- 4. 補足メモ -->
+        <div class="card panel-section">
+          <div class="section-header">
+            <div>
+              <h2 class="section-title">
+                <span class="step-num">4</span> 補足メモ
+              </h2>
+              <p class="section-desc">対戦時の連絡方法や条件を記入してください（空欄の場合は非表示になります）</p>
+            </div>
+            <span class="char-counter" id="noteCharCounter">0 / 300</span>
+          </div>
+
+          <textarea id="notesInput" class="textarea-input" rows="3" maxlength="300"
+            placeholder="例: SpellTableまたはDiscordにて対戦可能です。夜間はDiscord通話対戦歓迎！初心者歓迎、終了時間はご相談ください。"></textarea>
+        </div>
+
+      </section>
+
+      <!-- 右側：画像プレビュー ＆ 保存パネル -->
+      <aside class="preview-pane" aria-label="画像プレビューと保存">
+        <div class="card preview-card">
+          <div class="preview-header">
+            <h2 class="preview-title">画像プレビュー</h2>
+            <span class="badge badge-accent">16:9 共有用</span>
+          </div>
+
+          <!-- プレビューキャンバスコンテナ -->
+          <div class="canvas-viewport" id="canvasViewport">
+            <canvas id="previewCanvas" width="2560" height="1440" aria-label="生成された週間スケジュール画像プレビュー"></canvas>
+            <div class="canvas-loading" id="canvasLoading" style="display: none;">
+              <div class="spinner"></div>
+            </div>
+          </div>
+
+          <!-- 早見表（UIリアルタイムリングチャート） -->
+          <div class="ui-charts-container">
+            <div class="ui-chart-box">
+              <canvas id="uiWeekdayChart" width="220" height="220"></canvas>
+            </div>
+            <div class="ui-chart-box">
+              <canvas id="uiWeekendChart" width="220" height="220"></canvas>
+            </div>
+          </div>
+
+          <!-- エクスポート設定 -->
+          <div class="export-controls">
+            <div class="form-row">
+              <div class="form-col">
+                <label for="exportResolution" class="control-label">出力解像度</label>
+                <select id="exportResolution" class="select-input select-sm">
+                  <option value="2560x1440" selected>2560×1440 (2K・推奨)</option>
+                  <option value="1920x1080">1920×1080 (Full HD)</option>
+                  <option value="2400x1350">2400×1350 (SNS共有最適化)</option>
+                  <option value="3200x1800">3200×1800 (超高解像度)</option>
+                </select>
+              </div>
+
+              <div class="form-col">
+                <label for="exportFormat" class="control-label">画像形式</label>
+                <select id="exportFormat" class="select-input select-sm">
+                  <option value="png" selected>PNG (高画質・可逆圧縮)</option>
+                  <option value="jpeg">JPEG (軽量)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- JPEG画質調整（JPEG選択時のみ表示） -->
+            <div class="form-group" id="jpegQualityGroup" style="display: none;">
+              <div class="range-header">
+                <label for="jpegQuality">JPEG画質: <span id="jpegQualityVal">92%</span></label>
+              </div>
+              <input type="range" id="jpegQuality" min="0.5" max="1.0" step="0.02" value="0.92">
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="export-actions">
+              <button type="button" id="btnDownload" class="btn btn-primary btn-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                画像をダウンロード
+              </button>
+
+              <button type="button" id="btnCopyClipboard" class="btn btn-secondary btn-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                クリップボードに画像をコピー
+              </button>
+            </div>
+            <p class="export-hint">※ブラウザ上で画像が完全ローカル生成されます。サーバーへの送信は一切行われません。</p>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p class="copyright">
+        <strong>TimeLess</strong> - Player Availability Schedule Generator
+      </p>
+      <p class="disclaimer">
+        当ツールは個人が制作した非公式のファンメイドツールです。Wizards of the Coast社および各種ゲーム公式とは一切関係ありません。
+      </p>
+    </div>
+  </footer>
+
+  <!-- トースト通知 -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- スクリプト -->
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
+

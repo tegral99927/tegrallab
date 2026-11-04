@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="tlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+  </defs>
+  <!-- Outer circle track -->
+  <circle cx="50" cy="50" r="42" stroke="url(#tlGrad)" stroke-width="4" stroke-dasharray="180 85" stroke-linecap="round" />
+  <!-- Clock ticks -->
+  <line x1="50" y1="12" x2="50" y2="18" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+  <line x1="88" y1="50" x2="82" y2="50" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+  <line x1="50" y1="88" x2="50" y2="82" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+  <line x1="12" y1="50" x2="18" y2="50" stroke="#38BDF8" stroke-width="3" stroke-linecap="round" />
+  <!-- Stylized Hourglass / Infinity core -->
+  <path d="M34 32 H66 L50 49 L34 32 Z" fill="url(#tlGrad)" fill-opacity="0.9" />
+  <path d="M34 68 H66 L50 51 L34 68 Z" fill="url(#tlGrad)" fill-opacity="0.9" />
+  <circle cx="50" cy="50" r="4" fill="#F1F5F9" />
+</svg>
+

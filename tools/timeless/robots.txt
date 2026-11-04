@@ -1,0 +1,9 @@
+# robots.txt for TimeLess
+# https://tegrallab.com/tools/timeless/
+
+User-agent: *
+Allow: /
+
+# Sitemap URL
+Sitemap: https://tegrallab.com/tools/timeless/sitemap.xml
+
