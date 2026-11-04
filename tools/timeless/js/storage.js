@@ -5,11 +5,20 @@
 
 export const THEMES = ['midnight', 'emerald', 'violet', 'monochrome', 'light'];
 
+export const VOICE_CHAT_OPTIONS = {
+  ok: { id: 'ok', label: 'VC可能 (通話OK)', badge: 'VC OK' },
+  any: { id: 'any', label: 'どちらでもOK', badge: 'VC どちらでも' },
+  listen: { id: 'listen', label: '聞き専OK', badge: '聞き専OK' },
+  ng: { id: 'ng', label: 'VCなし (テキストのみ)', badge: 'VC なし' },
+  required: { id: 'required', label: 'VC必須', badge: 'VC 必須' }
+};
+
 export const DEFAULT_STATE = {
   version: 1,
   profile: {
     name: 'Player',
     timezone: 'JST (UTC+9)',
+    voiceChat: 'ok',
     comment: '',
     avatar: null, // dataURL string
     avatarZoom: 1,
@@ -39,7 +48,7 @@ export const DEFAULT_STATE = {
       id: 'arena',
       name: 'Arena',
       enabled: true,
-      formats: ['Standard', 'Explorer']
+      formats: ['Standard', 'Pioneer']
     },
     mo: {
       id: 'mo',
@@ -178,6 +187,9 @@ function mergeWithDefault(raw) {
     profile: {
       name: typeof raw.profile?.name === 'string' ? raw.profile.name.slice(0, 50) : base.profile.name,
       timezone: typeof raw.profile?.timezone === 'string' ? raw.profile.timezone.slice(0, 30) : base.profile.timezone,
+      voiceChat: ['ok', 'any', 'listen', 'ng', 'required'].includes(raw.profile?.voiceChat)
+        ? raw.profile.voiceChat
+        : base.profile.voiceChat,
       comment: typeof raw.profile?.comment === 'string' ? raw.profile.comment.slice(0, 100) : base.profile.comment,
       avatar: typeof raw.profile?.avatar === 'string' ? raw.profile.avatar : null,
       avatarZoom: typeof raw.profile?.avatarZoom === 'number' ? raw.profile.avatarZoom : 1,
@@ -196,7 +208,9 @@ function mergeWithDefault(raw) {
         id: 'arena',
         name: 'Arena',
         enabled: Boolean(raw.environments?.arena?.enabled),
-        formats: Array.isArray(raw.environments?.arena?.formats) ? raw.environments.arena.formats : base.environments.arena.formats
+        formats: Array.isArray(raw.environments?.arena?.formats)
+          ? raw.environments.arena.formats.map(f => f === 'Explorer' ? 'Pioneer' : f)
+          : base.environments.arena.formats
       },
       mo: {
         id: 'mo',
