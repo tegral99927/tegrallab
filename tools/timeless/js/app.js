@@ -25,6 +25,7 @@ const elements = {
   // Profile
   userName: document.getElementById('userName'),
   userTimezone: document.getElementById('userTimezone'),
+  userVoiceChat: document.getElementById('userVoiceChat'),
   userComment: document.getElementById('userComment'),
   avatarPreview: document.getElementById('avatarPreview'),
   avatarInput: document.getElementById('avatarInput'),
@@ -130,6 +131,7 @@ function syncUIFromState() {
   // プロフィール
   if (elements.userName) elements.userName.value = appState.profile.name || '';
   if (elements.userTimezone) elements.userTimezone.value = appState.profile.timezone || 'JST (UTC+9)';
+  if (elements.userVoiceChat) elements.userVoiceChat.value = appState.profile.voiceChat || 'ok';
   if (elements.userComment) elements.userComment.value = appState.profile.comment || '';
 
   if (appState.profile.avatar) {
@@ -525,6 +527,15 @@ function setupEventListeners() {
     saveState(appState);
     requestCanvasRender();
   });
+
+  // ボイスチャット
+  if (elements.userVoiceChat) {
+    elements.userVoiceChat.addEventListener('change', (e) => {
+      appState.profile.voiceChat = e.target.value;
+      saveState(appState);
+      requestCanvasRender();
+    });
+  }
 
   // 一言コメント
   elements.userComment.addEventListener('input', (e) => {

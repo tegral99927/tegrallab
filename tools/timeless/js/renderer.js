@@ -38,6 +38,40 @@ function roundRect(ctx, x, y, width, height, radius) {
 }
 
 /**
+ * ヘッドフォン / VCアイコン描画
+ */
+function drawHeadphoneIcon(ctx, x, y, color, isOff = false) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.fillStyle = color;
+  ctx.lineWidth = 1.6;
+  ctx.lineCap = 'round';
+
+  // ヘッドバンド (弧)
+  ctx.beginPath();
+  ctx.arc(x + 7, y + 6.5, 5, Math.PI, 0, false);
+  ctx.stroke();
+
+  // イヤーパッド (左右)
+  roundRect(ctx, x + 1, y + 5.5, 3, 6, 1);
+  ctx.fill();
+  roundRect(ctx, x + 10, y + 5.5, 3, 6, 1);
+  ctx.fill();
+
+  // OFFの場合は斜線
+  if (isOff) {
+    ctx.strokeStyle = '#EF4444';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(x + 1, y + 13);
+    ctx.lineTo(x + 13, y + 1);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+/**
  * 複数行テキストの折り返し描画
  */
 function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
@@ -266,22 +300,37 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   ctx.lineWidth = 2.5;
   ctx.stroke();
 
-  // ユーザー名 & タイムゾーン
+  // ユーザー名 & タイムゾーン & VC設定
   const nameX = profX + avatarSize + 22;
   const playerName = (state.profile?.name && state.profile.name.trim()) ? state.profile.name.trim() : 'Player';
   const tzText = state.profile?.timezone || 'JST (UTC+9)';
 
-  // タイムゾーンバッジの横幅を先に計算
+  // タイムゾーンバッジの横幅を計算
   ctx.font = '600 14px "Inter", sans-serif';
   const tzMetrics = ctx.measureText(tzText);
   const tzBadgeW = tzMetrics.width + 24;
   const tzBadgeH = 28;
 
+  // VCバッジの横幅を計算
+  const vcKey = state.profile?.voiceChat || 'ok';
+  const vcLabels = {
+    ok: 'VC OK',
+    any: 'VC 応相談',
+    listen: '聞き専 OK',
+    ng: 'VC なし',
+    required: 'VC 必須'
+  };
+  const vcLabel = vcLabels[vcKey] || 'VC OK';
+  ctx.font = '700 12px "Inter", "Noto Sans JP", sans-serif';
+  const vcMetrics = ctx.measureText(vcLabel);
+  const vcBadgeW = vcMetrics.width + 38;
+  const vcBadgeH = 28;
+
   // ユーザー名のフォントを設定して幅を正確に計測（長い場合は自動縮小して被りを防止）
   let nameFontSize = 32;
   ctx.font = `800 ${nameFontSize}px "Inter", "Noto Sans JP", sans-serif`;
   let nameMetrics = ctx.measureText(playerName);
-  const maxAvailableNameWidth = summaryBadgeX - nameX - tzBadgeW - 40;
+  const maxAvailableNameWidth = summaryBadgeX - nameX - tzBadgeW - vcBadgeW - 50;
 
   while (nameMetrics.width > maxAvailableNameWidth && nameFontSize > 18) {
     nameFontSize -= 2;
@@ -311,6 +360,30 @@ export async function renderExportCanvas(canvas, state, scheduleManager, options
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(tzText, tzBadgeX + tzBadgeW / 2, tzBadgeY + tzBadgeH / 2);
+
+  // VCバッジの描画（タイムゾーンバッジの隣に配置）
+  const vcBadgeX = tzBadgeX + tzBadgeW + 10;
+  const vcBadgeY = headerY + 28;
+
+  roundRect(ctx, vcBadgeX, vcBadgeY, vcBadgeW, vcBadgeH, 14);
+  const isVcActive = ['ok', 'required'].includes(vcKey);
+  const isVcNgo = vcKey === 'ng';
+
+  ctx.fillStyle = isVcActive ? `rgba(${palette.accentRgb}, 0.12)` : palette.panelSub;
+  ctx.fill();
+  ctx.strokeStyle = isVcActive ? palette.accent : (isVcNgo ? palette.gridLine : palette.border);
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // ヘッドフォンアイコン描画
+  drawHeadphoneIcon(ctx, vcBadgeX + 10, vcBadgeY + 7, isVcActive ? palette.accent : (isVcNgo ? palette.textMuted : palette.text), isVcNgo);
+
+  // VCテキスト描画
+  ctx.font = '700 12px "Inter", "Noto Sans JP", sans-serif';
+  ctx.fillStyle = isVcActive ? palette.accent : (isVcNgo ? palette.textMuted : palette.text);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(vcLabel, vcBadgeX + 28, vcBadgeY + vcBadgeH / 2);
 
   // プロフィールコメント（任意）
   ctx.textAlign = 'left';

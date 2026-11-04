@@ -180,16 +180,29 @@
                 <input type="text" id="userName" class="text-input" placeholder="例: Player" maxlength="30" value="Player">
               </div>
 
-              <div class="form-group">
-                <label for="userTimezone">タイムゾーン</label>
-                <select id="userTimezone" class="select-input">
-                  <option value="JST (UTC+9)" selected>日本標準時 - JST (UTC+9)</option>
-                  <option value="UTC">世界協定時 - UTC</option>
-                  <option value="PST (UTC-8)">米国太平洋 - PST (UTC-8)</option>
-                  <option value="EST (UTC-5)">米国東部 - EST (UTC-5)</option>
-                  <option value="CST (UTC+8)">中国 / 台湾 - CST (UTC+8)</option>
-                  <option value="KST (UTC+9)">韓国 - KST (UTC+9)</option>
-                </select>
+              <div class="form-row">
+                <div class="form-col">
+                  <label for="userTimezone">タイムゾーン</label>
+                  <select id="userTimezone" class="select-input">
+                    <option value="JST (UTC+9)" selected>日本標準時 - JST (UTC+9)</option>
+                    <option value="UTC">世界協定時 - UTC</option>
+                    <option value="PST (UTC-8)">米国太平洋 - PST (UTC-8)</option>
+                    <option value="EST (UTC-5)">米国東部 - EST (UTC-5)</option>
+                    <option value="CST (UTC+8)">中国 / 台湾 - CST (UTC+8)</option>
+                    <option value="KST (UTC+9)">韓国 - KST (UTC+9)</option>
+                  </select>
+                </div>
+
+                <div class="form-col">
+                  <label for="userVoiceChat">ボイスチャット (VC)</label>
+                  <select id="userVoiceChat" class="select-input">
+                    <option value="ok" selected>VC可能 (通話OK)</option>
+                    <option value="any">どちらでもOK (応相談)</option>
+                    <option value="listen">聞き専OK (聴くだけなら可)</option>
+                    <option value="ng">VCなし (テキストチャットのみ)</option>
+                    <option value="required">VC必須 (通話必須)</option>
+                  </select>
+                </div>
               </div>
 
               <div class="form-group">
@@ -346,7 +359,7 @@
               </div>
               <div class="format-tags-wrap" id="formats_arena">
                 <label class="format-tag"><input type="checkbox" value="Standard" checked><span>Standard</span></label>
-                <label class="format-tag"><input type="checkbox" value="Explorer" checked><span>Explorer</span></label>
+                <label class="format-tag"><input type="checkbox" value="Pioneer" checked><span>Pioneer</span></label>
                 <label class="format-tag"><input type="checkbox" value="Historic"><span>Historic</span></label>
                 <label class="format-tag"><input type="checkbox" value="Timeless"><span>Timeless</span></label>
                 <label class="format-tag"><input type="checkbox" value="Brawl"><span>Brawl</span></label>
