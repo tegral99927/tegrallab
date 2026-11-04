@@ -168,33 +168,33 @@ export function drawDonutChart(ctx, {
     const lx = cx + Math.cos(angle) * labelDist;
     const ly = cy + Math.sin(angle) * labelDist;
 
-    ctx.font = `600 ${Math.max(10, Math.round(11 * scale))}px "Inter", "Segoe UI", sans-serif`;
-    ctx.fillStyle = palette.textMuted;
+    ctx.font = `700 ${Math.max(11, Math.round(13 * scale))}px "Inter", "Segoe UI", sans-serif`;
+    ctx.fillStyle = palette.text;
     ctx.fillText(`${h}:00`, lx, ly);
   });
 
   // 4. リング中央のテキスト情報
   // タイトル
-  ctx.font = `700 ${Math.max(12, Math.round(13 * scale))}px "Inter", "Noto Sans JP", sans-serif`;
+  ctx.font = `800 ${Math.max(13, Math.round(15 * scale))}px "Inter", "Noto Sans JP", sans-serif`;
   ctx.fillStyle = palette.accent;
-  ctx.fillText(title, cx, cy - 26 * scale);
+  ctx.fillText(title, cx, cy - 28 * scale);
 
   // サブタイトル（英語または補足）
   if (subtitle) {
-    ctx.font = `500 ${Math.max(9, Math.round(10 * scale))}px "Inter", sans-serif`;
+    ctx.font = `700 ${Math.max(10, Math.round(12 * scale))}px "Noto Sans JP", sans-serif`;
     ctx.fillStyle = palette.textMuted;
     ctx.fillText(subtitle, cx, cy - 14 * scale);
   }
 
-  // 1日平均時間 (大きく表示)
-  ctx.font = `800 ${Math.max(22, Math.round(28 * scale))}px "Inter", sans-serif`;
+  // 1日平均時間 (大きく太く表示)
+  ctx.font = `900 ${Math.max(24, Math.round(32 * scale))}px "Inter", sans-serif`;
   ctx.fillStyle = palette.text;
-  ctx.fillText(averageHours, cx, cy + 8 * scale);
+  ctx.fillText(averageHours, cx, cy + 9 * scale);
 
   // 単位
-  ctx.font = `500 ${Math.max(9, Math.round(10 * scale))}px "Noto Sans JP", sans-serif`;
+  ctx.font = `700 ${Math.max(10, Math.round(11 * scale))}px "Noto Sans JP", sans-serif`;
   ctx.fillStyle = palette.textMuted;
-  ctx.fillText('平均時間 / 日', cx, cy + 26 * scale);
+  ctx.fillText('平均時間 / 日', cx, cy + 28 * scale);
 
   ctx.restore();
 }
