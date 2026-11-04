@@ -703,7 +703,10 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
     ctx.fillText(statusText, cardX + cardW - stMetrics.width - 16, curEnvY + 27);
 
     // フォーマットタグ一覧 (太く、大きく、視認性強化)
-    const formats = (env.formats || []).concat(state.customFormats || []);
+    // 自由追加フォーマットは「紙・リモート」のみに追加し、Arenaなど他環境には追加しない
+    const formats = env.id === 'paper'
+      ? (env.formats || []).concat(state.customFormats || [])
+      : (env.formats || []);
     let tagX = cardX + 14;
     let tagY = curEnvY + 52;
     const tagH = 30;
@@ -713,12 +716,17 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
       ctx.fillStyle = palette.textMuted;
       ctx.fillText(isEnabled ? 'フォーマット未設定' : '現在非対応', tagX, tagY + 18);
     } else {
-      formats.slice(0, 7).forEach(fmt => {
-        ctx.font = '700 14px "Inter", sans-serif';
+      for (const fmt of formats) {
+        ctx.font = '700 14px "Inter", "Noto Sans JP", sans-serif';
         const tw = ctx.measureText(fmt).width + 20;
         if (tagX + tw > cardX + cardW - 14) {
           tagX = cardX + 14;
           tagY += tagH + 8;
+        }
+
+        // カード外枠をはみ出さないように安全ガード
+        if (tagY + tagH > curEnvY + envItemH - 6) {
+          break;
         }
 
         roundRect(ctx, tagX, tagY, tw, tagH, 6);
@@ -732,7 +740,7 @@ async function drawRightPanel(ctx, x, y, width, height, state, scheduleManager, 
         ctx.fillText(fmt, tagX + 10, tagY + 20);
 
         tagX += tw + 8;
-      });
+      }
     }
 
     curEnvY += envItemH + 12;

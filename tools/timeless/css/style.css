@@ -695,10 +695,15 @@ body {
   color: #0B1020;
 }
 
-.custom-format-row {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
+.custom-format-row,
+.custom-format-section {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.env-box .custom-format-section {
+  margin-left: 26px;
 }
 
 .custom-format-label {

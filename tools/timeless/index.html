@@ -346,6 +346,16 @@
                 <label class="format-tag"><input type="checkbox" value="Pauper"><span>Pauper</span></label>
                 <label class="format-tag"><input type="checkbox" value="Vintage"><span>Vintage</span></label>
               </div>
+
+              <!-- 紙の自由追加フォーマット -->
+              <div class="custom-format-section">
+                <label for="customFormatInput" class="custom-format-label">自由追加フォーマット（紙・リモート）:</label>
+                <div class="input-with-button">
+                  <input type="text" id="customFormatInput" class="text-input" placeholder="例: Premodern, パウパー統率者, Old School" maxlength="20">
+                  <button type="button" id="btnAddCustomFormat" class="btn btn-secondary btn-sm">追加</button>
+                </div>
+                <div class="custom-format-list" id="customFormatList"></div>
+              </div>
             </div>
 
             <!-- MTG Arena -->
@@ -383,16 +393,6 @@
                 <label class="format-tag"><input type="checkbox" value="Commander"><span>Commander</span></label>
               </div>
             </div>
-          </div>
-
-          <!-- カスタムフォーマット自由追加 -->
-          <div class="custom-format-row">
-            <label for="customFormatInput" class="custom-format-label">自由追加フォーマット:</label>
-            <div class="input-with-button">
-              <input type="text" id="customFormatInput" class="text-input" placeholder="例: Premodern, パウパー統率者" maxlength="20">
-              <button type="button" id="btnAddCustomFormat" class="btn btn-secondary btn-sm">追加</button>
-            </div>
-            <div class="custom-format-list" id="customFormatList"></div>
           </div>
         </div>
 
