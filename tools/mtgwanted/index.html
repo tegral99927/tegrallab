@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <!-- Google Analytics (Tegral Lab Common) -->
+  <script src="/asset/js/gtag.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MTGWanted | 西部劇風MTG対戦相手募集ポスタージェネレーター【無料・登録不要】</title>
+
+  <!-- SEO Meta -->
+  <meta name="description"
+    content="Magic: The Gathering（MTG）の対戦相手募集用ポスター画像を西部劇のWANTED（指名手配書）スタイルで簡単作成！DiscordやBluesky、SNSで目立つヴィンテージ高解像度画像を完全無料・ブラウザ完結で生成できます。">
+  <meta name="keywords"
+    content="MTG, マジックザギャザリング, 対戦相手募集, WANTED, 指名手配書, 西部劇, Discord募集, リモート対戦, SpellTable, Commander, 統率者戦, MTG Arena, Magic Online, スケジュール画像, MTGWanted, Tegral Lab">
+  <meta name="author" content="Tegral Lab">
+  <meta name="robots" content="index, follow">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://tegrallab.com/tools/mtgwanted/">
+
+  <!-- Favicons & Icons -->
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/tools/mtgwanted/icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/tools/mtgwanted/icon.png">
+
+  <!-- Open Graph Protocol (OGP) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MTGWanted (Tegral Lab)">
+  <meta property="og:title" content="MTGWanted | 西部劇風MTG対戦相手募集ポスタージェネレーター">
+  <meta property="og:description"
+    content="西部劇のWANTEDポスター風に、MTG対戦相手募集画像を手軽に作成！大きなアイコンと日時表示でSNSのタイムラインでも一目で伝わります。完全無料・ローカル動作。">
+  <meta property="og:url" content="https://tegrallab.com/tools/mtgwanted/">
+  <meta property="og:image" content="https://tegrallab.com/tools/mtgwanted/icon.png">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="MTGWanted | 西部劇風MTG対戦相手募集ポスタージェネレーター">
+  <meta name="twitter:description"
+    content="西部劇のWANTEDポスター風に、MTG対戦相手募集画像を手軽に作成！大きなアイコンと日時表示でSNSのタイムラインでも一目で伝わります。完全無料・ローカル動作。">
+  <meta name="twitter:image" content="https://tegrallab.com/tools/mtgwanted/icon.png">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "MTGWanted",
+    "alternateName": "エムティージー・ウォンテッド",
+    "url": "https://tegrallab.com/tools/mtgwanted/",
+    "description": "Magic: The Gathering（MTG）の対戦相手募集画像を作成できるWebアプリケーション。西部劇のWANTEDポスターをモチーフとしたヴィンテージ感あふれる対戦募集ポスターを高解像度画像として即座に生成できます。",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript and HTML5 Canvas support",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "JPY"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Tegral Lab",
+      "url": "https://tegrallab.com/"
+    }
+  }
+  </script>
+
+  <!-- スタイルシート -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <!-- アプリケーションヘッダー -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-group">
+        <img src="icon.png" alt="MTGWanted Logo" class="brand-icon">
+        <div>
+          <div class="brand-title">
+            MTGWanted
+            <span class="brand-tag">BETA</span>
+          </div>
+          <div class="brand-subtitle">西部劇風 MTG対戦相手募集ポスタージェネレーター</div>
+        </div>
+      </div>
+      <div class="header-links">
+        <a href="/" class="header-link-btn">Tegral Lab トップ</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ (2カラムレイアウト) -->
+  <main class="app-main">
+    <div class="app-layout">
+
+      <!-- 左カラム: 入力・設定エディター -->
+      <section class="editor-pane" aria-label="設定エディター">
+
+        <!-- 1. プリセット選択 -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> 募集テンプレート</h2>
+          </div>
+          <div class="preset-grid" id="presetContainer">
+            <!-- JSで動的生成 -->
+          </div>
+        </div>
+
+        <!-- 2. プレイヤー情報 -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> プレイヤー情報</h2>
+          </div>
+
+          <div class="form-row-2 form-group">
+            <div class="form-col">
+              <label for="playerName" class="control-label">プレイヤー名</label>
+              <input type="text" id="playerName" class="form-input" placeholder="例: Planeswalker" maxlength="30">
+            </div>
+            <div class="form-col">
+              <label for="playerHandle" class="control-label">SNS ID / Discord</label>
+              <input type="text" id="playerHandle" class="form-input" placeholder="例: @YourHandle" maxlength="40">
+            </div>
+          </div>
+
+          <!-- アイコン画像 -->
+          <div class="form-group">
+            <label class="control-label">アイコン画像 (未設定時はオリジナルシルエット)</label>
+            <div class="avatar-upload-box">
+              <div class="file-input-wrapper">
+                <button type="button" class="btn btn-secondary btn-sm">画像ファイルを選択</button>
+                <input type="file" id="avatarFile" accept="image/png, image/jpeg, image/webp">
+              </div>
+              <button type="button" id="btnRemoveAvatar" class="btn btn-secondary btn-sm" style="display: none;">画像を解除</button>
+            </div>
+          </div>
+
+          <!-- アイコン調整 -->
+          <div class="form-row form-group">
+            <div class="form-col">
+              <div class="range-header">
+                <label for="avatarZoom">拡大・縮小: <span id="avatarZoomVal">100%</span></label>
+              </div>
+              <input type="range" id="avatarZoom" class="range-input" min="0.5" max="2.5" step="0.05" value="1.0">
+            </div>
+            <div class="form-col">
+              <div class="range-header">
+                <label for="avatarX">左右位置 (X)</label>
+              </div>
+              <input type="range" id="avatarX" class="range-input" min="-150" max="150" step="5" value="0">
+            </div>
+            <div class="form-col">
+              <div class="range-header">
+                <label for="avatarY">上下位置 (Y)</label>
+              </div>
+              <input type="range" id="avatarY" class="range-input" min="-150" max="150" step="5" value="0">
+            </div>
+          </div>
+
+          <div class="form-row form-group" style="align-items: center;">
+            <button type="button" id="btnResetAvatarPos" class="btn btn-secondary btn-sm">位置・倍率リセット</button>
+            <div class="radio-group" style="margin-left: auto;">
+              <span class="control-label" style="margin: 0;">形状:</span>
+              <label class="radio-label">
+                <input type="radio" name="avatarShape" id="avatarShapeCircle" value="circle" checked>
+                <span>丸型</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="avatarShape" id="avatarShapeSquare" value="square">
+                <span>四角型</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- セピア加工 -->
+          <div class="form-group" style="margin-top: 10px;">
+            <label class="checkbox-label">
+              <input type="checkbox" id="avatarSepia" checked>
+              <span>ヴィンテージ写真風セピア加工を適用</span>
+            </label>
+            <div id="avatarSepiaGroup" style="margin-top: 8px;">
+              <div class="range-header">
+                <label for="avatarSepiaIntensity">セピア強度: <span id="avatarSepiaVal">75%</span></label>
+              </div>
+              <input type="range" id="avatarSepiaIntensity" class="range-input" min="0" max="100" step="5" value="75">
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. 対戦日時候補 -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> 対戦日時候補</h2>
+            <button type="button" id="btnAddSlot" class="btn btn-secondary btn-sm">+ 候補を追加</button>
+          </div>
+
+          <!-- スロットリストコンテナ -->
+          <div id="slotsContainer">
+            <!-- JSで動的生成 -->
+          </div>
+
+          <div class="form-row-2 form-group" style="margin-top: 14px;">
+            <div class="form-col">
+              <label for="dateFormat" class="control-label">日時表示形式</label>
+              <select id="dateFormat" class="select-input">
+                <option value="western">西部劇風装飾 (✦ 11/07 [SAT] 20:00 ✦)</option>
+                <option value="japanese">日本語形式 (11月7日(土) 20:00〜)</option>
+                <option value="english">英語形式 (NOV 07 SAT 20:00 -)</option>
+              </select>
+            </div>
+            <div class="form-col" style="display: flex; flex-direction: column; justify-content: center; gap: 8px;">
+              <label class="checkbox-label">
+                <input type="checkbox" id="timeNegotiableGlobal" checked>
+                <span>「時間相談可」を表示</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="anytimeWelcomeGlobal">
+                <span>「いつでも歓迎」を表示</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. 対戦環境 & フォーマット -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> 対戦環境 & フォーマット</h2>
+          </div>
+
+          <!-- 対戦環境 -->
+          <div class="form-group">
+            <label class="control-label">対戦環境（複数選択可）</label>
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 10px;">
+              <label class="checkbox-label">
+                <input type="checkbox" id="envInPerson">
+                <span>紙（対面）</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="envRemote" checked>
+                <span>紙（リモート対戦）</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="envArena" checked>
+                <span>MTG Arena</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="envMo">
+                <span>Magic Online</span>
+              </label>
+            </div>
+
+            <!-- 対面場所入力 -->
+            <div id="envInPersonGroup" class="form-group" style="display: none;">
+              <label for="inPersonLocation" class="control-label">対面対戦の希望場所・店舗名</label>
+              <input type="text" id="inPersonLocation" class="form-input" placeholder="例: 都内カードショップ / フリースペース" maxlength="40">
+            </div>
+
+            <!-- リモートツール入力 -->
+            <div id="envRemoteGroup" class="form-group" style="display: none;">
+              <label for="remoteTool" class="control-label">リモート対戦利用ツール</label>
+              <input type="text" id="remoteTool" class="form-input" placeholder="例: SpellTable / Discord" maxlength="40">
+            </div>
+          </div>
+
+          <!-- フォーマット -->
+          <div class="form-group">
+            <label class="control-label">フォーマット（複数選択可）</label>
+            <div class="format-grid" id="formatsContainer">
+              <!-- JSで動的生成 -->
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customFormat" class="control-label">その他フォーマット（自由記述）</label>
+            <input type="text" id="customFormat" class="form-input" placeholder="例: プレイド限定モダン, ドラフト等" maxlength="30">
+          </div>
+        </div>
+
+        <!-- 5. 募集要項メモ -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> 募集要項メモ</h2>
+          </div>
+          <div class="form-group">
+            <label for="notesText" class="control-label">自由記述（BO1/BO3、初心者歓迎、デッキ、VC可否など）</label>
+            <textarea id="notesText" class="form-textarea" placeholder="対戦の条件や補足事項を入力してください..." maxlength="500"></textarea>
+            <div class="char-counter"><span id="notesCharCount">0</span> / 500文字</div>
+          </div>
+
+          <!-- クイックタグ -->
+          <div class="quick-tags-container">
+            <span class="control-label" style="width: 100%; margin-bottom: 2px;">よく使う文言ワンタップ挿入:</span>
+            <button type="button" class="quick-tag-btn" data-tag="初心者歓迎！">初心者歓迎</button>
+            <button type="button" class="quick-tag-btn" data-tag="カジュアル対戦希望">カジュアル希望</button>
+            <button type="button" class="quick-tag-btn" data-tag="BO1 / BO3どちらでも可">BO1 / BO3</button>
+            <button type="button" class="quick-tag-btn" data-tag="統率者ブラケット: 2〜3（カジュアル寄り）">統率者ブラケット2〜3</button>
+            <button type="button" class="quick-tag-btn" data-tag="Discord通話あり（VC可）">VCあり</button>
+            <button type="button" class="quick-tag-btn" data-tag="VCなし（チャット対戦）">VCなし</button>
+            <button type="button" class="quick-tag-btn" data-tag="観戦・聞き専歓迎！">観戦歓迎</button>
+            <button type="button" class="quick-tag-btn" data-tag="プロキシ相談可">プロキシ可</button>
+          </div>
+        </div>
+
+        <!-- 6. ポスターデザイン設定 -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> デザインカスタマイズ</h2>
+          </div>
+
+          <!-- テーマ選択 -->
+          <div class="form-group">
+            <label class="control-label">テーマ選択</label>
+            <div class="theme-selector-grid">
+              <div class="theme-card active" data-theme="classic">
+                <div class="theme-swatch swatch-classic"></div>
+                <div>
+                  <div class="theme-name">Classic Wanted</div>
+                  <div class="theme-desc">黄ばんだ羊皮紙＆木版</div>
+                </div>
+              </div>
+              <div class="theme-card" data-theme="dark">
+                <div class="theme-swatch swatch-dark"></div>
+                <div>
+                  <div class="theme-name">Dark Outlaw</div>
+                  <div class="theme-desc">夜の無法者風ダーク</div>
+                </div>
+              </div>
+              <div class="theme-card" data-theme="bounty">
+                <div class="theme-swatch swatch-bounty"></div>
+                <div>
+                  <div class="theme-name">Red Bounty</div>
+                  <div class="theme-desc">深紅の賞金首風</div>
+                </div>
+              </div>
+              <div class="theme-card" data-theme="minimal">
+                <div class="theme-swatch swatch-minimal"></div>
+                <div>
+                  <div class="theme-name">Minimal Western</div>
+                  <div class="theme-desc">現代的ウェスタン</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 見出しとサブタイトル -->
+          <div class="form-row-2 form-group">
+            <div class="form-col">
+              <label for="posterTitle" class="control-label">メイン見出し</label>
+              <input type="text" id="posterTitle" class="form-input" value="WANTED" maxlength="20">
+            </div>
+            <div class="form-col">
+              <label for="posterSubtitle" class="control-label">サブタイトル</label>
+              <input type="text" id="posterSubtitle" class="form-input" value="OPPONENT WANTED" maxlength="30">
+            </div>
+          </div>
+
+          <!-- 画像サイズとステータス -->
+          <div class="form-row-2 form-group">
+            <div class="form-col">
+              <label for="posterSize" class="control-label">画像サイズ・比率</label>
+              <select id="posterSize" class="select-input">
+                <option value="landscape">標準横長 (1600 × 900 / 16:9)</option>
+                <option value="landscape_hd">高解像度横長 (1920 × 1080 / 16:9)</option>
+                <option value="square">正方形 (1200 × 1200 / 1:1)</option>
+                <option value="portrait">縦長ポスター (1200 × 1600 / 3:4)</option>
+                <option value="long_portrait">長尺ポスター (1200 × 1900 / 2:3+)</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="posterStatus" class="control-label">募集ステータス (スタンプ)</label>
+              <select id="posterStatus" class="select-input">
+                <option value="recruiting">募集中 (スタンプなし)</option>
+                <option value="matched">対戦相手決定 (MATCH FOUND)</option>
+                <option value="closed">募集終了 (CLOSED)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 枠線と用紙の質感 -->
+          <div class="form-row-2 form-group">
+            <div class="form-col">
+              <label for="borderStyle" class="control-label">外枠スタイル</label>
+              <select id="borderStyle" class="select-input">
+                <option value="triple">トリプル木版枠</option>
+                <option value="ornate">オーナメント枠</option>
+                <option value="rope">ロープ調ヴィンテージ枠</option>
+                <option value="simple">シンプル二重枠</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="paperTexture" class="control-label">用紙テクスチャ</label>
+              <select id="paperTexture" class="select-input">
+                <option value="parchment">羊皮紙（エイジング＆染み）</option>
+                <option value="grain">ヴィンテージ粒子（かすれ）</option>
+                <option value="rough">粗挽きクラフト（荒い質感）</option>
+                <option value="clean">スムースアンティーク（控えめ）</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 装飾量・アイコンサイズ・配置 -->
+          <div class="form-row form-group">
+            <div class="form-col">
+              <label for="ornamentDensity" class="control-label">装飾量</label>
+              <select id="ornamentDensity" class="select-input">
+                <option value="high">多め (豪華)</option>
+                <option value="normal" selected>標準</option>
+                <option value="minimal">少なめ (シンプル)</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="iconSize" class="control-label">アイコンサイズ</label>
+              <select id="iconSize" class="select-input">
+                <option value="large" selected>大 (推奨)</option>
+                <option value="xlarge">特大</option>
+                <option value="medium">中</option>
+              </select>
+            </div>
+            <div class="form-col">
+              <label for="textAlign" class="control-label">テキスト配置</label>
+              <select id="textAlign" class="select-input">
+                <option value="center" selected>中央揃え</option>
+                <option value="left">左揃え</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 文字サイズ微調整 & フッター -->
+          <div class="form-group">
+            <div class="range-header">
+              <label for="fontSizeScale">日時フォント倍率: <span id="fontSizeScaleVal">100%</span></label>
+            </div>
+            <input type="range" id="fontSizeScale" class="range-input" min="0.8" max="1.2" step="0.05" value="1.0">
+          </div>
+
+          <div class="form-group">
+            <label for="customFooter" class="control-label">最下部フッターテキスト</label>
+            <input type="text" id="customFooter" class="form-input" value="REWARD: GLORIOUS BATTLE & HONOR" maxlength="50">
+          </div>
+        </div>
+
+        <!-- 7. 設定管理 -->
+        <div class="panel-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> 設定の保存と復元</h2>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+            <button type="button" id="btnExportJson" class="btn btn-secondary btn-sm">設定をJSON出力</button>
+            <button type="button" id="btnImportJson" class="btn btn-secondary btn-sm">JSON設定を読込</button>
+            <input type="file" id="jsonFileInput" accept=".json, application/json" style="display: none;">
+            <button type="button" id="btnResetAll" class="btn btn-secondary btn-sm" style="margin-left: auto;">初期化</button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 右カラム: リアルタイムプレビュー & エクスポート (Sticky) -->
+      <aside class="preview-pane" aria-label="ポスタープレビューと出力">
+
+        <div class="preview-card">
+          <div class="panel-card-header">
+            <h2 class="panel-card-title"><span class="title-icon">✦</span> リアルタイムプレビュー</h2>
+          </div>
+
+          <!-- キャンバス表示ラッパー -->
+          <div class="preview-wrapper" id="previewContainer">
+            <canvas id="posterCanvas" width="1600" height="900"></canvas>
+          </div>
+
+          <!-- はみ出し警告バナー -->
+          <div id="overflowWarningBanner" class="overflow-warning-banner" style="display: none;">
+            <span class="warning-icon">⚠️</span>
+            <div class="warning-content">
+              <strong>テキスト量が多いため文字が小さくなっています。</strong>
+              <p>長尺ポスターに切り替えるか、文章を少し短くすると読みやすくなります。（文字の勝手な省略や削除は行われません）</p>
+              <button type="button" id="btnSwitchLongPoster" class="btn-switch-long">長尺ポスターに切り替える</button>
+            </div>
+          </div>
+
+          <!-- エクスポート設定 -->
+          <div style="margin-top: 16px;">
+            <div class="form-row-2 form-group">
+              <div class="form-col">
+                <label for="exportFormat" class="control-label">保存形式</label>
+                <select id="exportFormat" class="select-input">
+                  <option value="png" selected>PNG (高画質・可逆圧縮)</option>
+                  <option value="jpeg">JPEG (軽量)</option>
+                </select>
+              </div>
+
+              <!-- JPEG品質（JPEG選択時のみ表示） -->
+              <div class="form-col" id="jpegQualityGroup" style="display: none;">
+                <div class="range-header">
+                  <label for="jpegQuality">JPEG品質: <span id="jpegQualityVal">92%</span></label>
+                </div>
+                <input type="range" id="jpegQuality" class="range-input" min="0.5" max="1.0" step="0.02" value="0.92">
+              </div>
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="export-actions">
+              <button type="button" id="btnDownload" class="btn btn-primary btn-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                画像をダウンロード
+              </button>
+
+              <button type="button" id="btnCopyClipboard" class="btn btn-secondary btn-block">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                クリップボードに画像をコピー
+              </button>
+            </div>
+
+            <p class="export-hint">※画像生成はすべてお使いのブラウザ内で完結します。サーバーへの画像送信は一切行われません。</p>
+          </div>
+        </div>
+
+        <!-- 開発者支援（ドネーション）カード（画像保存後に表示） -->
+        <div id="donationCard" class="donation-card" style="display: none;">
+          <div class="donation-header">
+            <span class="donation-title">☕ 開発活動へのご支援</span>
+            <button type="button" id="btnDismissDonation" class="btn-dismiss" title="閉じる">✕</button>
+          </div>
+          <p class="donation-text">
+            MTGWantedを使っていただきありがとうございます。このツールが役に立ったら、開発活動を支援していただけるとうれしいです。
+          </p>
+          <a id="boothLink" href="https://tegrallab.booth.pm/" target="_blank" rel="noopener noreferrer" class="btn btn-gold btn-block btn-sm">
+            BOOTHで支援する（任意）
+          </a>
+        </div>
+
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- フッター -->
+  <footer class="app-footer">
+    <div class="footer-inner">
+      <p><strong>MTGWanted</strong> - Western Wanted Poster Generator for MTG Duelists</p>
+      <p class="disclaimer">
+        当ツールは個人が制作した非公式のファンメイドツールです。Wizards of the Coast社および各種ゲーム公式とは一切関係ありません。<br>
+        「Magic: The Gathering」などの製品名・固有名詞はゲームを説明する目的でのみ使用しています。
+      </p>
+    </div>
+  </footer>
+
+  <!-- トースト通知コンテナ -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- スクリプト -->
+  <script type="module" src="js/app.js"></script>
+</body>
+
+</html>
+

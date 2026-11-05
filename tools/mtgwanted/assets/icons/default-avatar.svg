@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e8dcbe"/>
+      <stop offset="70%" stop-color="#d4c29d"/>
+      <stop offset="100%" stop-color="#bba377"/>
+    </radialGradient>
+    <filter id="distress">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  <!-- Background aged circle -->
+  <circle cx="200" cy="200" r="195" fill="url(#bgGrad)" stroke="#4a3018" stroke-width="6"/>
+  <circle cx="200" cy="200" r="182" fill="none" stroke="#6e4c27" stroke-width="2" stroke-dasharray="8 5"/>
+
+  <!-- Cowboy Silhouette in distressed dark woodblock brown -->
+  <g fill="#2d1b0d" filter="url(#distress)">
+    <!-- Cowboy Hat -->
+    <!-- Brim -->
+    <path d="M 50,158 C 75,138 120,132 200,132 C 280,132 325,138 350,158 C 362,168 350,178 320,172 C 275,164 240,166 200,166 C 160,166 125,164 80,172 C 50,178 38,168 50,158 Z"/>
+    <!-- Crown -->
+    <path d="M 125,142 C 122,110 135,78 165,72 C 180,69 200,82 220,72 C 248,78 265,108 262,142 C 235,138 155,138 125,142 Z"/>
+    <!-- Hat band -->
+    <path d="M 128,136 C 150,133 238,133 260,136 L 258,143 C 236,140 152,140 130,143 Z" fill="#633e1c"/>
+
+    <!-- Head & Neck -->
+    <path d="M 152,166 C 152,215 168,235 200,235 C 232,235 248,215 248,166 Z"/>
+
+    <!-- Bandana / Wild Rag around neck -->
+    <path d="M 160,225 L 200,270 L 240,225 C 220,232 180,232 160,225 Z" fill="#8c2a1c"/>
+    <path d="M 195,264 L 205,264 L 202,282 L 198,282 Z" fill="#8c2a1c"/>
+
+    <!-- Shoulders & Coat -->
+    <path d="M 85,380 C 85,280 130,248 175,242 L 200,270 L 225,242 C 270,248 315,280 315,380 Z"/>
+
+    <!-- Western Star Sheriff Badge on Lapel -->
+    <polygon points="145,285 149,297 161,297 151,304 155,316 145,308 135,316 139,304 129,297 141,297" fill="#d4af37" stroke="#4a3018" stroke-width="1.5"/>
+  </g>
+</svg>
