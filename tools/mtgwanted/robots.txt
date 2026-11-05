@@ -1,0 +1,9 @@
+# robots.txt for MTGWanted
+# https://tegrallab.com/tools/mtgwanted/
+
+User-agent: *
+Allow: /
+
+# Sitemap URL
+Sitemap: https://tegrallab.com/tools/mtgwanted/sitemap.xml
+
