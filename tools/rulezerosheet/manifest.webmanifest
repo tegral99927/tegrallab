@@ -1,0 +1,21 @@
+{
+  "name": "Commander Rule Zero Sheet Maker",
+  "short_name": "Rule0Sheet",
+  "description": "MTG統率者戦のルールゼロデッキ紹介シートを30秒で作成・共有できるツール",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0c1017",
+  "theme_color": "#d4af37",
+  "icons": [
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/apple-touch-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
