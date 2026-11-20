@@ -1,0 +1,46 @@
+/* ==========================================================================
+   print.css - 印刷用スタイルシート
+   ========================================================================== */
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* 非表示要素 */
+  .app-header,
+  .mobile-tabs,
+  .form-pane,
+  .preview-actions-bar,
+  .info-bottom-area,
+  .modal-overlay,
+  .app-toast {
+    display: none !important;
+  }
+
+  .main-content {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .preview-pane {
+    position: static !important;
+    width: 100% !important;
+  }
+
+  .sheet-preview-card {
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    page-break-inside: avoid;
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
