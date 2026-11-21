@@ -10,7 +10,8 @@ import { renderSheetToCanvas } from "./sheet-renderer.js";
  * @param {string} lang
  */
 export async function downloadSheetPNG(deck, lang = "ja") {
-  const canvas = await renderSheetToCanvas(deck, lang);
+  const previewCanvas = document.getElementById("sheet-preview-canvas");
+  const canvas = previewCanvas || await renderSheetToCanvas(deck, lang);
   const deckName = (deck.deckName || "rule0_sheet").replace(/[/\\?%*:|"<>]/g, "_");
   const filename = `${deckName}_bracket${deck.bracket}.png`;
 
@@ -39,7 +40,8 @@ export async function copySheetToClipboard(deck, lang = "ja") {
   }
 
   try {
-    const canvas = await renderSheetToCanvas(deck, lang);
+    const previewCanvas = document.getElementById("sheet-preview-canvas");
+    const canvas = previewCanvas || await renderSheetToCanvas(deck, lang);
     return new Promise(resolve => {
       canvas.toBlob(async blob => {
         if (!blob) {
@@ -68,7 +70,8 @@ export async function copySheetToClipboard(deck, lang = "ja") {
  * @param {string} lang
  */
 export async function shareSheetWeb(deck, lang = "ja") {
-  const canvas = await renderSheetToCanvas(deck, lang);
+  const previewCanvas = document.getElementById("sheet-preview-canvas");
+  const canvas = previewCanvas || await renderSheetToCanvas(deck, lang);
   return new Promise(resolve => {
     canvas.toBlob(async blob => {
       if (!blob) {
