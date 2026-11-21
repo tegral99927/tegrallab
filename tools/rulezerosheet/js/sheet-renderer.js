@@ -1,15 +1,19 @@
 /**
- * sheet-renderer.js - シートのHTMLプレビュー更新およびCanvas (1600x900) 描画
+ * sheet-renderer.js - リアルタイムプレビューおよび1600x900高解像度PNG画像描画エンジン
+ * プレビューと出力画像が100%完全一致するようCanvas直接描画方式を採用
  */
 
 import { APP_CONFIG } from "./config.js";
 import { i18n } from "./i18n.js";
 
-// 画像のプリロード＆キャッシュ用
+// 画像プリロード＆キャッシュ用
 const imageCache = new Map();
+let latestRenderToken = 0;
 
 /**
- * 画像を非同期ロード（CORS対応、失敗時はnull）
+ * 画像を非同期ロード（CORS対応、キャッシュ利用）
+ * @param {string} url
+ * @returns {Promise<HTMLImageElement|null>}
  */
 export function loadImageAsync(url) {
   if (!url) return Promise.resolve(null);
@@ -33,206 +37,171 @@ export function loadImageAsync(url) {
 }
 
 /**
- * プレビューDOMの更新
+ * タグの注意レベル・カテゴリ判定
+ * @param {string} tagText
+ * @returns {"severe-caution" | "caution" | "avoid" | "pref" | "feature"}
+ */
+export function getTagCategory(tagText) {
+  if (!tagText) return "feature";
+  const text = String(tagText).trim();
+  const lower = text.toLowerCase();
+
+  // 1. 避けたい展開（⚠️またはキーワード）
+  if (text.startsWith("⚠️") || lower.includes("避けたい") || lower.includes("avoid")) {
+    return "avoid";
+  }
+
+  // 2. 最重要注意項目（無限コンボ、2枚コンボ、土地破壊、スタックス、追加ターンなど）
+  if (
+    lower.includes("無限") ||
+    lower.includes("infinite") ||
+    lower.includes("2枚コンボ") ||
+    lower.includes("2-card") ||
+    lower.includes("土地破壊") ||
+    lower.includes("mld") ||
+    lower.includes("スタックス") ||
+    lower.includes("stax") ||
+    lower.includes("ロック") ||
+    lower.includes("lock") ||
+    lower.includes("追加ターン") ||
+    lower.includes("extra turn")
+  ) {
+    return "severe-caution";
+  }
+
+  // 3. 注意・事前共有項目（コンボ、プロキシ、全体除去、打ち消し、サーチなど）
+  if (
+    lower.includes("コンボ") ||
+    lower.includes("combo") ||
+    lower.includes("プロキシ") ||
+    lower.includes("proxy") ||
+    lower.includes("全体除去") ||
+    lower.includes("board wipe") ||
+    lower.includes("打ち消し") ||
+    lower.includes("counter") ||
+    lower.includes("サーチ") ||
+    lower.includes("tutor")
+  ) {
+    return "caution";
+  }
+
+  // 4. ポジティブな対戦希望
+  if (
+    lower.includes("歓迎") ||
+    lower.includes("welcome") ||
+    lower.includes("ゆっくり") ||
+    lower.includes("chill") ||
+    lower.includes("ok") ||
+    lower.includes("調整中") ||
+    lower.includes("testing")
+  ) {
+    return "pref";
+  }
+
+  return "feature";
+}
+
+/**
+ * カテゴリごとの配色取得
+ */
+export function getTagColors(category, isDark) {
+  switch (category) {
+    case "severe-caution":
+      return {
+        bg: isDark ? "rgba(239, 68, 68, 0.24)" : "#fee2e2",
+        border: isDark ? "rgba(239, 68, 68, 0.75)" : "#ef4444",
+        text: isDark ? "#f87171" : "#b91c1c"
+      };
+    case "avoid":
+      return {
+        bg: isDark ? "rgba(244, 63, 94, 0.24)" : "#ffe4e6",
+        border: isDark ? "rgba(244, 63, 94, 0.75)" : "#f43f5e",
+        text: isDark ? "#fb7185" : "#be123c"
+      };
+    case "caution":
+      return {
+        bg: isDark ? "rgba(245, 158, 11, 0.24)" : "#fef3c7",
+        border: isDark ? "rgba(245, 158, 11, 0.75)" : "#f59e0b",
+        text: isDark ? "#fbbf24" : "#b45309"
+      };
+    case "pref":
+      return {
+        bg: isDark ? "rgba(16, 185, 129, 0.20)" : "#dcfce7",
+        border: isDark ? "rgba(16, 185, 129, 0.65)" : "#16a34a",
+        text: isDark ? "#4ade80" : "#15803d"
+      };
+    case "feature":
+    default:
+      return {
+        bg: isDark ? "rgba(56, 189, 248, 0.16)" : "#e0f2fe",
+        border: isDark ? "rgba(56, 189, 248, 0.50)" : "#0284c7",
+        text: isDark ? "#38bdf8" : "#0369a1"
+      };
+  }
+}
+
+/**
+ * プロキシ状態の表示文字列取得
+ */
+export function getProxyStatusText(status, lang = "ja") {
+  if (status === "some") {
+    return lang === "ja" ? "一部プロキシあり" : "Some Proxies";
+  } else if (status === "full") {
+    return lang === "ja" ? "フルプロキシ" : "Full Proxy";
+  } else if (status === "none") {
+    return lang === "ja" ? "なし（すべて本物）" : "None (100% Genuine)";
+  }
+  return "";
+}
+
+/**
+ * プレビュー更新
+ * Canvasによる直接描画を行い、Webプレビューとエクスポート画像の「完全な一致」を保証
  * @param {HTMLElement} container
  * @param {object} deck
  * @param {string} lang
  */
-export function updatePreviewDOM(container, deck, lang = "ja") {
+export async function updatePreviewDOM(container, deck, lang = "ja") {
   if (!container) return;
 
-  const bracket = APP_CONFIG.brackets.find(b => b.id === deck.bracket) || APP_CONFIG.brackets[1];
-  const isDark = deck.sheetTheme !== "light";
-  const isQuick = deck.sheetType !== "detailed";
-
-  // 統率者画像HTML
-  let commanderImgsHtml = "";
-  if (deck.commanders && deck.commanders.length > 0) {
-    const validCmds = deck.commanders.filter(c => c.name || c.imageUrl);
-    if (validCmds.length === 0) {
-      commanderImgsHtml = `
-        <div class="sheet-card-placeholder">
-          <div class="placeholder-icon">🂠</div>
-          <div class="placeholder-text">${lang === "ja" ? "コマンダーを選択してください" : "Select a Commander"}</div>
-        </div>
-      `;
-    } else {
-      commanderImgsHtml = validCmds.map((c, i) => {
-        const displayName = lang === "ja" ? (c.printedName || c.name) : (c.name || c.printedName);
-        if (c.imageUrl) {
-          return `
-            <div class="sheet-card-img-wrap ${validCmds.length > 1 ? 'is-partner' : ''}">
-              <img src="${escapeHtml(c.imageUrl)}" alt="${escapeHtml(displayName)}" class="sheet-commander-img" crossorigin="anonymous" />
-            </div>
-          `;
-        } else {
-          return `
-            <div class="sheet-card-placeholder ${validCmds.length > 1 ? 'is-partner' : ''}">
-              <div class="placeholder-icon">⚔️</div>
-              <div class="placeholder-text">${escapeHtml(displayName || "Commander")}</div>
-            </div>
-          `;
-        }
-      }).join("");
-    }
+  let canvas = container.querySelector("#sheet-preview-canvas");
+  if (!canvas) {
+    container.innerHTML = "";
+    canvas = document.createElement("canvas");
+    canvas.id = "sheet-preview-canvas";
+    canvas.width = APP_CONFIG.sheetWidth;
+    canvas.height = APP_CONFIG.sheetHeight;
+    container.appendChild(canvas);
   }
 
-  // コマンダー名
-  const cmdNames = (deck.commanders || [])
-    .map(c => lang === "ja" ? (c.printedName || c.name) : (c.name || c.printedName))
-    .filter(Boolean)
-    .join(" & ") || (lang === "ja" ? "コマンダー未設定" : "No Commander Set");
-
-  // デッキ名
-  const deckTitle = deck.deckName || (lang === "ja" ? "コマンダールールゼロシート" : "Commander Rule 0 Sheet");
-
-  // ブラケット名
-  const bracketName = lang === "ja" ? bracket.nameJa : bracket.nameEn;
-  const bracketDesc = lang === "ja" ? bracket.descriptionJa : bracket.descriptionEn;
-
-  // 特徴タグ
-  const featuresHtml = (deck.deckFeatures || []).map(f => `
-    <span class="sheet-tag feature-tag">${escapeHtml(f)}</span>
-  `).join("");
-
-  // 対戦希望タグ
-  const playPrefsHtml = (deck.playPreferences || []).map(p => `
-    <span class="sheet-tag pref-tag">${escapeHtml(p)}</span>
-  `).join("");
-
-  // 避けたい展開タグ
-  const avoidPrefsHtml = (deck.avoidPreferences || []).map(a => `
-    <span class="sheet-tag avoid-tag">⚠️ ${escapeHtml(a)}</span>
-  `).join("");
-
-  // 詳細モード用の項目
-  let detailedSectionHtml = "";
-  if (!isQuick) {
-    detailedSectionHtml = `
-      <div class="sheet-detail-grid">
-        ${deck.winConditions ? `
-          <div class="detail-item">
-            <span class="detail-label">🎯 ${lang === "ja" ? "主な勝ち筋" : "Win Condition"}:</span>
-            <span class="detail-value">${escapeHtml(deck.winConditions)}</span>
-          </div>
-        ` : ""}
-        ${deck.comboDescription ? `
-          <div class="detail-item">
-            <span class="detail-label">⚡ ${lang === "ja" ? "コンボ・成立条件" : "Combos"}:</span>
-            <span class="detail-value">${escapeHtml(deck.comboDescription)}</span>
-          </div>
-        ` : ""}
-        ${deck.approxWinTurn ? `
-          <div class="detail-item">
-            <span class="detail-label">⏱️ ${lang === "ja" ? "想定決着ターン" : "Decisive Turn"}:</span>
-            <span class="detail-value">${escapeHtml(deck.approxWinTurn)}</span>
-          </div>
-        ` : ""}
-      </div>
-    `;
-  }
-
-  // 警告表示
-  const isOverGcLimit = bracket.maxGameChangers < 90 && deck.gameChangerCount > bracket.maxGameChangers;
-  const gcWarningHtml = isOverGcLimit ? `
-    <div class="sheet-gc-warning">
-      ⚠️ Bracket ${bracket.id} allows up to ${bracket.maxGameChangers} Game Changers (${deck.gameChangerCount} registered)
-    </div>
-  ` : "";
-
-  // HTML組み立て
-  container.className = `sheet-preview-card theme-${deck.sheetTheme || 'dark'} ${isQuick ? 'mode-quick' : 'mode-detailed'}`;
-  container.innerHTML = `
-    <div class="sheet-inner">
-      <!-- 左ペイン: カード画像 -->
-      <div class="sheet-left-col">
-        <div class="sheet-cards-container">
-          ${commanderImgsHtml}
-        </div>
-      </div>
-
-      <!-- 右ペイン: 情報 -->
-      <div class="sheet-right-col">
-        <!-- ヘッダー -->
-        <div class="sheet-header">
-          <div class="sheet-deck-title">${escapeHtml(deckTitle)}</div>
-          <div class="sheet-commander-names">${escapeHtml(cmdNames)}</div>
-          ${deck.commanderDescription ? `<div class="sheet-cmd-desc">${escapeHtml(deck.commanderDescription)}</div>` : ""}
-        </div>
-
-        <!-- パワーステータス (ブラケット & ゲームチェンジャー) -->
-        <div class="sheet-power-row">
-          <div class="sheet-bracket-box" style="--bracket-color: ${bracket.badgeColor}; --bracket-bg: ${bracket.badgeBg}; --bracket-border: ${bracket.borderColor};">
-            <div class="bracket-num-badge">BRACKET ${bracket.id}</div>
-            <div class="bracket-name-title">${escapeHtml(bracketName)}</div>
-            <div class="bracket-turn-estimate">${escapeHtml(bracket.expectedTurn)}</div>
-          </div>
-
-          <div class="sheet-gc-box">
-            <div class="gc-header-label">GAME CHANGERS</div>
-            <div class="gc-number-count">${deck.gameChangerCount || 0}</div>
-            <div class="gc-source-tag">${deck.gameChangerCountSource === 'automatic' ? 'Deck Scanned' : 'Self-Reported'}</div>
-          </div>
-        </div>
-        ${gcWarningHtml}
-
-        <!-- デッキの特徴 -->
-        <div class="sheet-section">
-          <div class="sheet-section-title">${lang === "ja" ? "デッキの特徴" : "Deck Features"}</div>
-          <div class="sheet-tags-wrap">
-            ${featuresHtml || `<span class="empty-hint">${lang === "ja" ? "特徴未選択" : "No features specified"}</span>`}
-          </div>
-        </div>
-
-        <!-- 詳細モード追加情報 -->
-        ${detailedSectionHtml}
-
-        <!-- 対戦希望・マナー -->
-        <div class="sheet-section pref-section">
-          <div class="sheet-section-title">${lang === "ja" ? "対戦前の希望・相談事項" : "Pre-Game Expectations & Preferences"}</div>
-          <div class="sheet-tags-wrap">
-            ${playPrefsHtml}
-            ${avoidPrefsHtml}
-          </div>
-        </div>
-
-        ${deck.additionalNotes ? `
-          <div class="sheet-notes-box">
-            <span class="notes-icon">💬</span>
-            <span class="notes-text">${escapeHtml(deck.additionalNotes)}</span>
-          </div>
-        ` : ""}
-
-        <!-- フッター -->
-        <div class="sheet-footer">
-          <span class="footer-app-name">Commander Rule Zero Sheet Maker</span>
-          <span class="footer-brand">Tegral Lab • tegrallab.com</span>
-        </div>
-      </div>
-    </div>
-  `;
+  // 1600x900 Canvasを更新描画
+  await renderSheetToCanvas(deck, lang, canvas);
 }
 
 /**
  * 1600x900の高解像度PNG画像をCanvas APIで描画
+ * 余白のバランスを自動最適化し、文字が詰まりすぎずスペースを最大限美しく活用
  * @param {object} deck
  * @param {string} lang
+ * @param {HTMLCanvasElement|null} targetCanvas
  * @returns {Promise<HTMLCanvasElement>}
  */
-export async function renderSheetToCanvas(deck, lang = "ja") {
+export async function renderSheetToCanvas(deck, lang = "ja", targetCanvas = null) {
+  const currentToken = ++latestRenderToken;
   const width = APP_CONFIG.sheetWidth;
   const height = APP_CONFIG.sheetHeight;
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  const canvas = targetCanvas || document.createElement("canvas");
+  if (canvas.width !== width) canvas.width = width;
+  if (canvas.height !== height) canvas.height = height;
+
   const ctx = canvas.getContext("2d");
 
   const bracket = APP_CONFIG.brackets.find(b => b.id === deck.bracket) || APP_CONFIG.brackets[1];
   const isDark = deck.sheetTheme !== "light";
   const isQuick = deck.sheetType !== "detailed";
 
-  // 背景色・グラデーション
+  // 1. 背景描画
   if (isDark) {
     const bgGradient = ctx.createLinearGradient(0, 0, width, height);
     bgGradient.addColorStop(0, "#0b0f17");
@@ -241,8 +210,8 @@ export async function renderSheetToCanvas(deck, lang = "ja") {
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 微細なグリッド・アクセントライン
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+    // 高級感のある繊細なグリッドアクセントライン
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.035)";
     ctx.lineWidth = 1;
     for (let x = 0; x < width; x += 80) {
       ctx.beginPath();
@@ -258,8 +227,8 @@ export async function renderSheetToCanvas(deck, lang = "ja") {
     ctx.fillRect(0, 0, width, height);
   }
 
-  // 外枠
-  ctx.strokeStyle = isDark ? "rgba(212, 175, 55, 0.4)" : "#cbd5e1";
+  // 外枠（MTGゴールドフレーム）
+  ctx.strokeStyle = isDark ? "rgba(212, 175, 55, 0.45)" : "#cbd5e1";
   ctx.lineWidth = 4;
   ctx.strokeRect(16, 16, width - 32, height - 32);
 
@@ -268,169 +237,249 @@ export async function renderSheetToCanvas(deck, lang = "ja") {
   ctx.lineWidth = 1;
   ctx.strokeRect(24, 24, width - 48, height - 48);
 
-  // --- 左側: 統率者カード画像描画 (プレビューと同じく大迫力で配置) ---
-  const leftX = 50;
-  const leftY = 50;
-  const cardH = 780;
-  const cardW = 560; // MTGカード標準比率 (約 1 : 1.39)
+  // 2. 左側: コマンダーカード画像描画 (MTG縦横比 1 : 1.3968)
+  const leftX = 55;
+  const leftY = 65;
+  const cardH = 760;
+  const cardW = 544;
 
   const validCmds = (deck.commanders || []).filter(c => c && (c.name || c.imageUrl));
+
+  // 画像非同期ロード
+  let img1 = null;
+  let img2 = null;
+  if (validCmds.length === 1 && validCmds[0].imageUrl) {
+    img1 = await loadImageAsync(validCmds[0].imageUrl);
+  } else if (validCmds.length > 1) {
+    if (validCmds[0]?.imageUrl) img1 = await loadImageAsync(validCmds[0].imageUrl);
+    if (validCmds[1]?.imageUrl) img2 = await loadImageAsync(validCmds[1].imageUrl);
+  }
+
+  // 非同期ロード中にさらに新しい描画リクエストが発生した場合は中断
+  if (targetCanvas && currentToken !== latestRenderToken) {
+    return canvas;
+  }
+
   if (validCmds.length === 0) {
-    // プレースホルダー枠
-    drawCardPlaceholder(ctx, leftX + 10, leftY + 10, cardW, cardH, lang === "ja" ? "コマンダーカード" : "Commander Card", isDark);
+    drawCardPlaceholder(ctx, leftX, leftY, cardW, cardH, lang === "ja" ? "コマンダーカード" : "Commander Card", isDark);
   } else if (validCmds.length === 1) {
     const cmd = validCmds[0];
-    const img = cmd.imageUrl ? await loadImageAsync(cmd.imageUrl) : null;
-    if (img) {
-      drawRoundedImage(ctx, img, leftX + 10, leftY + 10, cardW, cardH, 20);
+    if (img1) {
+      drawShadowedImage(ctx, img1, leftX, leftY, cardW, cardH, 18);
     } else {
-      drawCardPlaceholder(ctx, leftX + 10, leftY + 10, cardW, cardH, cmd.printedName || cmd.name || "Commander", isDark);
+      drawCardPlaceholder(ctx, leftX, leftY, cardW, cardH, cmd.printedName || cmd.name || "Commander", isDark);
     }
   } else {
-    // 2枚コマンダー（共闘・パートナー）: プレビューに合わせて大きく重なり描画
-    const pCardW = 440;
-    const pCardH = 614;
-    // 1枚目 (上・左寄)
-    const img1 = validCmds[0].imageUrl ? await loadImageAsync(validCmds[0].imageUrl) : null;
+    // 2枚コマンダー（共闘・パートナー）: 本格的な重なり表示
+    const pCardW = 430;
+    const pCardH = 600;
+
     if (img1) {
-      drawRoundedImage(ctx, img1, leftX, leftY + 10, pCardW, pCardH, 16);
+      drawShadowedImage(ctx, img1, leftX, leftY + 10, pCardW, pCardH, 16);
     } else {
       drawCardPlaceholder(ctx, leftX, leftY + 10, pCardW, pCardH, validCmds[0].name || "Partner 1", isDark);
     }
-    // 2枚目 (下・右寄)
-    const img2 = validCmds[1].imageUrl ? await loadImageAsync(validCmds[1].imageUrl) : null;
+
     if (img2) {
-      drawRoundedImage(ctx, img2, leftX + 150, leftY + 170, pCardW, pCardH, 16);
+      drawShadowedImage(ctx, img2, leftX + 115, leftY + 150, pCardW, pCardH, 16);
     } else {
-      drawCardPlaceholder(ctx, leftX + 150, leftY + 170, pCardW, pCardH, validCmds[1].name || "Partner 2", isDark);
+      drawCardPlaceholder(ctx, leftX + 115, leftY + 150, pCardW, pCardH, validCmds[1].name || "Partner 2", isDark);
     }
   }
 
-  // --- 右側: 情報エリア (プレビューと同じ大きく見やすいタイポグラフィ) ---
-  const rightX = 660;
-  let currY = 65;
-  const contentWidth = width - rightX - 55;
+  // 3. 右側: 情報エリア (バランスの良い垂直レイアウト計算)
+  const rightX = 645;
+  const contentWidth = width - rightX - 55; // 約900px
+  let currY = 58;
 
-  // 1. デッキ名 & コマンダー名
+  // --- ヘッダー ---
   const deckTitle = deck.deckName || (lang === "ja" ? "コマンダールールゼロシート" : "Commander Rule 0 Sheet");
   ctx.fillStyle = isDark ? "#fbbf24" : "#b45309";
-  ctx.font = "bold 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(deckTitle.toUpperCase(), rightX, currY);
-  currY += 50;
+  currY += 44; // デッキ名とコマンダーカード名の間にゆとりのある行間を確保
 
-  const cmdNames = (deck.commanders || [])
+  const cmdNames = validCmds
     .map(c => lang === "ja" ? (c.printedName || c.name) : (c.name || c.printedName))
     .filter(Boolean)
     .join(" & ") || (lang === "ja" ? "コマンダー未設定" : "No Commander Set");
 
   ctx.fillStyle = isDark ? "#ffffff" : "#0f172a";
-  ctx.font = "900 48px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  // コマンダー名が長い場合は自動調整
+  ctx.font = "900 40px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  if (ctx.measureText(cmdNames).width > contentWidth) {
+    ctx.font = "900 32px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  }
   ctx.fillText(truncateText(ctx, cmdNames, contentWidth), rightX, currY);
-  currY += 40;
+  currY += 46;
 
   if (deck.commanderDescription) {
     ctx.fillStyle = isDark ? "#94a3b8" : "#475569";
-    ctx.font = "italic 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-    currY = wrapText(ctx, `“${deck.commanderDescription}”`, rightX, currY, contentWidth, 34, 2);
+    ctx.font = "italic 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    currY = wrapText(ctx, `“${deck.commanderDescription}”`, rightX, currY, contentWidth, 28, 2);
     currY += 16;
   } else {
-    currY += 14;
+    currY += 10;
   }
 
-  // 2. ブラケット & ゲームチェンジャー バナー (特大サイズで明瞭)
+  // --- パワーバナー (ブラケット & ゲームチェンジャー) ---
   const bannerY = currY;
-  const bannerH = 130;
+  const bannerH = 118;
   const bracketW = 490;
   const gcW = contentWidth - bracketW - 20;
 
   // Bracket Box
-  drawRoundedRect(ctx, rightX, bannerY, bracketW, bannerH, 14, bracket.badgeBg, bracket.borderColor, 3);
+  drawRoundedRect(ctx, rightX, bannerY, bracketW, bannerH, 14, bracket.badgeBg, bracket.borderColor, 2.5);
 
-  // Bracket Number Badge
   ctx.fillStyle = bracket.badgeColor;
-  ctx.font = "900 64px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(`BRACKET ${bracket.id}`, rightX + 24, bannerY + 68);
+  ctx.font = "900 56px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(`BRACKET ${bracket.id}`, rightX + 24, bannerY + 60);
 
-  // Bracket Name & Details
   const bracketName = lang === "ja" ? bracket.nameJa : bracket.nameEn;
   ctx.fillStyle = isDark ? "#ffffff" : "#0f172a";
-  ctx.font = "bold 28px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(bracketName, rightX + 24, bannerY + 108);
+  ctx.font = "bold 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(bracketName, rightX + 24, bannerY + 100);
 
   ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(`• ${bracket.expectedTurn}`, rightX + 260, bannerY + 108);
+  ctx.font = "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(`• ${bracket.expectedTurn}`, rightX + 230, bannerY + 100);
 
   // Game Changers Box
   const gcX = rightX + bracketW + 20;
-  drawRoundedRect(ctx, gcX, bannerY, gcW, bannerH, 14, isDark ? "rgba(255,255,255,0.05)" : "#ffffff", isDark ? "rgba(255,255,255,0.2)" : "#cbd5e1", 2);
+  const isOverGcLimit = bracket.maxGameChangers < 90 && deck.gameChangerCount > bracket.maxGameChangers;
 
-  ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-  ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText("GAME CHANGERS", gcX + 22, bannerY + 40);
+  if (isOverGcLimit) {
+    drawRoundedRect(ctx, gcX, bannerY, gcW, bannerH, 14, isDark ? "rgba(239, 68, 68, 0.20)" : "#fee2e2", "#ef4444", 2.5);
+    ctx.fillStyle = "#f87171";
+    ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.fillText("⚠️ OVER BRACKET LIMIT", gcX + 20, bannerY + 36);
+    ctx.fillStyle = "#ef4444";
+  } else {
+    drawRoundedRect(ctx, gcX, bannerY, gcW, bannerH, 14, isDark ? "rgba(255,255,255,0.05)" : "#ffffff", isDark ? "rgba(255,255,255,0.18)" : "#cbd5e1", 2);
+    ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+    ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.fillText("GAME CHANGERS", gcX + 20, bannerY + 36);
+    ctx.fillStyle = isDark ? "#38bdf8" : "#0284c7";
+  }
 
-  ctx.fillStyle = isDark ? "#38bdf8" : "#0284c7";
-  ctx.font = "900 70px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(`${deck.gameChangerCount || 0}`, gcX + 22, bannerY + 108);
+  ctx.font = "900 62px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(`${deck.gameChangerCount || 0}`, gcX + 20, bannerY + 100);
 
   ctx.fillStyle = isDark ? "#64748b" : "#94a3b8";
-  ctx.font = "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   const gcSourceText = deck.gameChangerCountSource === "automatic" ? "Deck Scanned" : "Self-Reported";
-  ctx.fillText(gcSourceText, gcX + 115, bannerY + 102);
+  ctx.fillText(gcSourceText, gcX + 105, bannerY + 95);
 
-  currY = bannerY + bannerH + 34;
+  currY = bannerY + bannerH;
 
-  // 3. 特徴タグ
-  ctx.fillStyle = isDark ? "#e2e8f0" : "#1e293b";
-  ctx.font = "bold 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(lang === "ja" ? "デッキの特徴 (Deck Features)" : "Deck Features", rightX, currY);
-  currY += 32;
-
+  // --- コンテンツ量に応じた適応型余白（スペースを美しく均等配分） ---
   const features = deck.deckFeatures || [];
-  currY = drawTagList(ctx, features, rightX, currY, contentWidth, isDark ? "rgba(56, 189, 248, 0.15)" : "#e0f2fe", isDark ? "#38bdf8" : "#0369a1", isDark ? "#38bdf8" : "#0284c7", 2);
-  currY += 28;
+  const playPrefs = deck.playPreferences || [];
+  const avoidPrefs = (deck.avoidPreferences || []).map(a => `⚠️ ${a.replace(/^⚠️\s*/, '')}`);
+  const combinedPrefs = [...playPrefs, ...avoidPrefs];
 
-  // 4. 詳細項目 (詳細モードのみ)
-  if (!isQuick) {
+  const hasDetailedInfo = Boolean(
+    deck.winConditions ||
+    deck.comboDescription ||
+    deck.approxWinTurn ||
+    (deck.proxyStatus && deck.proxyStatus !== "none")
+  );
+  const showDetailed = (!isQuick || hasDetailedInfo);
+
+  // タグ設定 (快適で見やすいゆとりのあるサイズ)
+  const tagConfig = {
+    font: "bold 16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    height: 38,
+    paddingH: 14,
+    gapX: 8,
+    gapY: 8,
+    radius: 7
+  };
+
+  // 高さの予測計算
+  const featuresMeasure = measureTagRows(ctx, features, contentWidth, tagConfig);
+  const prefsMeasure = measureTagRows(ctx, combinedPrefs, contentWidth, tagConfig);
+
+  let numDetailRows = 0;
+  if (showDetailed) {
+    if (deck.winConditions) numDetailRows++;
+    if (deck.comboDescription) numDetailRows++;
+    if (deck.approxWinTurn) numDetailRows++;
+    if (deck.proxyStatus && deck.proxyStatus !== "none") numDetailRows++;
+  }
+
+  const contentEstimatedH =
+    (28 + featuresMeasure.height) +
+    (showDetailed && numDetailRows > 0 ? (numDetailRows * 34 + 8) : 0) +
+    (28 + prefsMeasure.height) +
+    (deck.additionalNotes ? 52 : 0);
+
+  const availableHeight = 840 - currY;
+  const remainingSpace = Math.max(0, availableHeight - contentEstimatedH);
+
+  // 余白の均等配分（最小20px、最大38px）
+  const sectionCount = 2 + (showDetailed && numDetailRows > 0 ? 1 : 0) + (deck.additionalNotes ? 1 : 0);
+  const sectionGap = Math.max(18, Math.min(36, Math.floor(remainingSpace / (sectionCount + 1))));
+
+  currY += sectionGap;
+
+  // --- 1. 特徴タグ（全件表示、省略なし） ---
+  ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.fillText(lang === "ja" ? "デッキの特徴 (Deck Features)" : "Deck Features", rightX, currY);
+  currY += 26;
+
+  currY = drawTagList(ctx, features, rightX, currY, contentWidth, tagConfig, isDark);
+  currY += sectionGap;
+
+  // --- 2. 詳細情報（入力値がある場合は確実に表示） ---
+  if (showDetailed && numDetailRows > 0) {
+    const detailLabelFont = "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    const detailValueFont = "600 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    const detailStep = 34;
+
     if (deck.winConditions) {
-      drawTextPair(ctx, rightX, currY, "🎯 " + (lang === "ja" ? "主な勝ち筋:" : "Win Condition:"), deck.winConditions, contentWidth, isDark);
-      currY += 44;
+      drawTextPair(ctx, rightX, currY, "🎯 " + (lang === "ja" ? "主な勝ち筋:" : "Win Condition:"), deck.winConditions, contentWidth, isDark, "#38bdf8", detailValueFont, detailLabelFont);
+      currY += detailStep;
     }
     if (deck.comboDescription) {
-      drawTextPair(ctx, rightX, currY, "⚡ " + (lang === "ja" ? "コンボ・成立条件:" : "Combos:"), deck.comboDescription, contentWidth, isDark);
-      currY += 44;
+      drawTextPair(ctx, rightX, currY, "⚡ " + (lang === "ja" ? "コンボ・成立条件:" : "Combos:"), deck.comboDescription, contentWidth, isDark, "#fbbf24", detailValueFont, detailLabelFont);
+      currY += detailStep;
     }
     if (deck.approxWinTurn) {
-      drawTextPair(ctx, rightX, currY, "⏱️ " + (lang === "ja" ? "想定決着ターン:" : "Target Turn:"), deck.approxWinTurn, contentWidth, isDark);
-      currY += 44;
+      drawTextPair(ctx, rightX, currY, "⏱️ " + (lang === "ja" ? "想定決着ターン:" : "Target Turn:"), deck.approxWinTurn, contentWidth, isDark, isDark ? "#94a3b8" : "#64748b", detailValueFont, detailLabelFont);
+      currY += detailStep;
     }
-    currY += 10;
+    if (deck.proxyStatus && deck.proxyStatus !== "none") {
+      drawTextPair(ctx, rightX, currY, "🃏 " + (lang === "ja" ? "プロキシ:" : "Proxies:"), getProxyStatusText(deck.proxyStatus, lang), contentWidth, isDark, "#c084fc", detailValueFont, detailLabelFont);
+      currY += detailStep;
+    }
+
+    currY += sectionGap - 10;
   }
 
-  // 5. 対戦希望・マナー
-  ctx.fillStyle = isDark ? "#e2e8f0" : "#1e293b";
-  ctx.font = "bold 24px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  // --- 3. 対戦希望・マナー（全件表示） ---
+  ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(lang === "ja" ? "対戦前の希望・相談事項 (Pre-Game Expectations)" : "Pre-Game Expectations & Preferences", rightX, currY);
-  currY += 32;
+  currY += 26;
 
-  const playPrefs = deck.playPreferences || [];
-  const avoidPrefs = (deck.avoidPreferences || []).map(a => `⚠️ ${a}`);
-  const combinedPrefs = [...playPrefs, ...avoidPrefs];
-  currY = drawTagList(ctx, combinedPrefs, rightX, currY, contentWidth, isDark ? "rgba(16, 185, 129, 0.15)" : "#dcfce7", isDark ? "#4ade80" : "#15803d", isDark ? "#4ade80" : "#16a34a", 2);
+  currY = drawTagList(ctx, combinedPrefs, rightX, currY, contentWidth, tagConfig, isDark);
 
-  // メモ
+  // --- 4. 自由メモ ---
   if (deck.additionalNotes) {
-    currY += 26;
-    drawRoundedRect(ctx, rightX, currY, contentWidth, 54, 10, isDark ? "rgba(255,255,255,0.04)" : "#f8fafc", isDark ? "rgba(255,255,255,0.15)" : "#e2e8f0", 1);
+    currY += sectionGap;
+    const notesBoxH = 46;
+    drawRoundedRect(ctx, rightX, currY, contentWidth, notesBoxH, 8, isDark ? "rgba(255,255,255,0.04)" : "#f8fafc", isDark ? "rgba(255,255,255,0.15)" : "#e2e8f0", 1);
     ctx.fillStyle = isDark ? "#cbd5e1" : "#334155";
-    ctx.font = "20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-    ctx.fillText(`💬 ${truncateText(ctx, deck.additionalNotes, contentWidth - 40)}`, rightX + 18, currY + 34);
+    ctx.font = "17px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    ctx.fillText(`💬 ${truncateText(ctx, deck.additionalNotes, contentWidth - 40)}`, rightX + 16, currY + 29);
   }
 
-  // フッター (下部に整列)
-  const footerY = height - 45;
+  // --- フッター ---
+  const footerY = height - 42;
   ctx.fillStyle = isDark ? "#64748b" : "#94a3b8";
-  ctx.font = "16px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = "15px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText("Commander Rule Zero Sheet Maker • Powered by Scryfall API", rightX, footerY);
 
   ctx.textAlign = "right";
@@ -440,7 +489,7 @@ export async function renderSheetToCanvas(deck, lang = "ja") {
   return canvas;
 }
 
-// ヘルパー描画関数
+// ---------------- ヘルパー描画関数 ----------------
 
 function drawRoundedRect(ctx, x, y, width, height, radius, fill, stroke, strokeWidth = 1) {
   ctx.save();
@@ -458,7 +507,22 @@ function drawRoundedRect(ctx, x, y, width, height, radius, fill, stroke, strokeW
   ctx.restore();
 }
 
-function drawRoundedImage(ctx, img, x, y, width, height, radius) {
+function drawShadowedImage(ctx, img, x, y, width, height, radius) {
+  ctx.save();
+
+  // カードシャドウ
+  ctx.shadowColor = "rgba(0, 0, 0, 0.65)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetX = 3;
+  ctx.shadowOffsetY = 8;
+
+  // 画像クリップ＆描画
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, height, radius);
+  ctx.fillStyle = "#000";
+  ctx.fill(); // シャドウ発生用ベース
+
+  ctx.shadowColor = "transparent";
   ctx.save();
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
@@ -466,78 +530,117 @@ function drawRoundedImage(ctx, img, x, y, width, height, radius) {
   ctx.drawImage(img, x, y, width, height);
   ctx.restore();
 
-  // カード枠のシャドウ・境界線
-  ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+  // カード境界線
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
   ctx.stroke();
+
   ctx.restore();
 }
 
 function drawCardPlaceholder(ctx, x, y, width, height, title, isDark) {
-  drawRoundedRect(ctx, x, y, width, height, 16, isDark ? "#1e293b" : "#e2e8f0", isDark ? "#475569" : "#cbd5e1", 2);
+  drawRoundedRect(ctx, x, y, width, height, 18, isDark ? "#1e293b" : "#e2e8f0", isDark ? "#475569" : "#cbd5e1", 2);
   ctx.fillStyle = isDark ? "#64748b" : "#94a3b8";
-  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = "bold 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.textAlign = "center";
   ctx.fillText(title, x + width / 2, y + height / 2);
   ctx.textAlign = "left";
 }
 
-function drawTagList(ctx, tags, x, y, maxWidth, bg, textCol, borderCol, maxRows = 2) {
+/**
+ * タグの高さを事前計測
+ */
+function measureTagRows(ctx, tags, maxWidth, tagConfig) {
+  if (!tags || tags.length === 0) return { rows: 0, height: 0 };
+  let curX = 0;
+  let rows = 1;
+  const { height: tagH, paddingH, gapX, gapY, font } = tagConfig;
+  ctx.font = font;
+
+  for (let i = 0; i < tags.length; i++) {
+    const rawTag = tags[i];
+    const category = getTagCategory(rawTag);
+    let displayTag = rawTag;
+    if (category === "severe-caution" && !rawTag.startsWith("⚠️") && !rawTag.startsWith("⚡")) {
+      displayTag = `⚠️ ${rawTag}`;
+    } else if (category === "caution" && !rawTag.startsWith("⚡") && !rawTag.startsWith("⚠️")) {
+      displayTag = `⚡ ${rawTag}`;
+    }
+    const textWidth = ctx.measureText(displayTag).width;
+    const tagW = Math.min(textWidth + paddingH * 2, maxWidth);
+
+    if (curX + tagW > maxWidth && curX > 0) {
+      curX = 0;
+      rows++;
+    }
+    curX += tagW + gapX;
+  }
+  return { rows, height: rows * tagH + (rows - 1) * gapY };
+}
+
+/**
+ * タグ一覧を省略せずにすべて描画する
+ * 行を折り返し、注意・警告タグは配色を変えて描画
+ */
+function drawTagList(ctx, tags, x, y, maxWidth, tagConfig, isDark) {
   if (!tags || tags.length === 0) return y;
 
   let curX = x;
   let curY = y;
-  const paddingH = 16;
-  const tagH = 42;
-  let rowIndex = 0;
+  const { height: tagH, paddingH, gapX, gapY, radius, font } = tagConfig;
 
-  ctx.font = "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+  ctx.font = font;
 
   for (let i = 0; i < tags.length; i++) {
-    const tag = tags[i];
-    const textWidth = ctx.measureText(tag).width;
-    const tagW = textWidth + paddingH * 2;
+    const rawTag = tags[i];
+    const category = getTagCategory(rawTag);
+    const colors = getTagColors(category, isDark);
 
-    if (curX + tagW > x + maxWidth) {
-      rowIndex++;
-      if (rowIndex >= maxRows) {
-        // 残り件数を小さなバッジで描画して打ち止め
-        const remaining = tags.length - i;
-        if (remaining > 0) {
-          const moreText = `+${remaining}`;
-          const moreW = ctx.measureText(moreText).width + 20;
-          drawRoundedRect(ctx, curX, curY, moreW, tagH, 8, bg, borderCol, 1);
-          ctx.fillStyle = textCol;
-          ctx.fillText(moreText, curX + 10, curY + 27);
-        }
-        break;
-      }
-      curX = x;
-      curY += tagH + 10;
+    let displayTag = rawTag;
+    if (category === "severe-caution" && !rawTag.startsWith("⚠️") && !rawTag.startsWith("⚡")) {
+      displayTag = `⚠️ ${rawTag}`;
+    } else if (category === "caution" && !rawTag.startsWith("⚡") && !rawTag.startsWith("⚠️")) {
+      displayTag = `⚡ ${rawTag}`;
     }
 
-    drawRoundedRect(ctx, curX, curY, tagW, tagH, 8, bg, borderCol, 1);
-    ctx.fillStyle = textCol;
-    ctx.fillText(tag, curX + paddingH, curY + 27);
+    const textWidth = ctx.measureText(displayTag).width;
+    const tagW = Math.min(textWidth + paddingH * 2, maxWidth);
 
-    curX += tagW + 10;
+    if (curX + tagW > x + maxWidth && curX > x) {
+      curX = x;
+      curY += tagH + gapY;
+    }
+
+    drawRoundedRect(ctx, curX, curY, tagW, tagH, radius, colors.bg, colors.border, 1.5);
+    ctx.fillStyle = colors.text;
+    ctx.font = font;
+    ctx.fillText(truncateText(ctx, displayTag, tagW - paddingH * 1.5), curX + paddingH, curY + tagH * 0.68);
+
+    curX += tagW + gapX;
   }
 
   return curY + tagH;
 }
 
-function drawTextPair(ctx, x, y, label, text, maxWidth, isDark) {
-  ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
-  ctx.font = "bold 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+function drawTextPair(ctx, x, y, label, text, maxWidth, isDark, labelColor, font, labelFont) {
+  ctx.fillStyle = labelColor || (isDark ? "#94a3b8" : "#64748b");
+  ctx.font = labelFont || "bold 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
   ctx.fillText(label, x, y);
 
   const labelW = ctx.measureText(label).width + 12;
   ctx.fillStyle = isDark ? "#ffffff" : "#0f172a";
-  ctx.font = "600 20px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
-  ctx.fillText(truncateText(ctx, text, maxWidth - labelW), x + labelW, y);
+  ctx.font = font || "600 18px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+
+  const availW = maxWidth - labelW;
+  if (ctx.measureText(text).width <= availW) {
+    ctx.fillText(text, x + labelW, y);
+  } else {
+    // 少し長い場合はフォントを微縮小して可能な限りそのまま描画
+    ctx.font = font.replace(/\d+(\.\d+)?px/, (m) => `${Math.max(13, parseFloat(m) * 0.9)}px`);
+    ctx.fillText(truncateText(ctx, text, availW), x + labelW, y);
+  }
 }
 
 function truncateText(ctx, text, maxWidth) {
@@ -564,7 +667,6 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
       y += lineHeight;
       linesCount++;
       if (linesCount >= maxLines - 1) {
-        // 残りを省略
         ctx.fillText(truncateText(ctx, text.substring(n), maxWidth), x, y);
         return y + lineHeight;
       }
@@ -574,14 +676,4 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 2) {
   }
   ctx.fillText(line, x, y);
   return y + lineHeight;
-}
-
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }

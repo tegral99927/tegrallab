@@ -621,22 +621,84 @@ select:focus, input:focus, textarea:focus {
   flex-wrap: wrap;
 }
 
-/* Sheet Card Styles (Live Preview) */
+/* Sheet Card Styles (Live Canvas Preview) */
 .sheet-preview-card {
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: var(--radius-md);
   overflow: hidden;
   position: relative;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   display: flex;
-  border: 2px solid var(--border-color);
+  background: transparent;
+  border: none;
+}
+
+#sheet-preview-canvas {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+/* 密度別変数設定（項目が増えたら自動縮小し全件収める） */
+.sheet-preview-card.density-standard {
+  --preview-tag-font: 0.72vw;
+  --preview-tag-padding: 3px 9px;
+  --preview-tag-gap: 6px;
+  --preview-banner-gap: 12px;
+  --preview-banner-pad: 8px 14px;
+  --preview-banner-num: 1.4vw;
+  --preview-banner-name: 0.95vw;
+  --preview-gc-num: 1.6vw;
+  --preview-right-gap: 0.65vw;
+  --preview-detail-font: 0.72vw;
+  --preview-section-title: 0.75vw;
+  --preview-cmd-font: 1.5vw;
+  --preview-deck-title: 0.95vw;
+  --preview-notes-font: 0.7vw;
+}
+
+.sheet-preview-card.density-dense {
+  --preview-tag-font: 0.62vw;
+  --preview-tag-padding: 2px 7px;
+  --preview-tag-gap: 5px;
+  --preview-banner-gap: 10px;
+  --preview-banner-pad: 6px 11px;
+  --preview-banner-num: 1.25vw;
+  --preview-banner-name: 0.85vw;
+  --preview-gc-num: 1.4vw;
+  --preview-right-gap: 0.48vw;
+  --preview-detail-font: 0.64vw;
+  --preview-section-title: 0.68vw;
+  --preview-cmd-font: 1.35vw;
+  --preview-deck-title: 0.85vw;
+  --preview-notes-font: 0.64vw;
+}
+
+.sheet-preview-card.density-extra-dense {
+  --preview-tag-font: 0.54vw;
+  --preview-tag-padding: 1.5px 5.5px;
+  --preview-tag-gap: 4px;
+  --preview-banner-gap: 8px;
+  --preview-banner-pad: 5px 8px;
+  --preview-banner-num: 1.1vw;
+  --preview-banner-name: 0.76vw;
+  --preview-gc-num: 1.25vw;
+  --preview-right-gap: 0.35vw;
+  --preview-detail-font: 0.56vw;
+  --preview-section-title: 0.6vw;
+  --preview-cmd-font: 1.2vw;
+  --preview-deck-title: 0.78vw;
+  --preview-notes-font: 0.58vw;
 }
 
 .sheet-preview-card.theme-dark {
   background: linear-gradient(135deg, #0b0f17 0%, #111827 50%, #0d131f 100%);
   color: #f1f5f9;
-  border-color: rgba(212, 175, 55, 0.4);
+  border-color: rgba(212, 175, 55, 0.45);
 }
 
 .sheet-preview-card.theme-light {
@@ -669,6 +731,31 @@ select:focus, input:focus, textarea:focus {
   align-items: center;
   justify-content: center;
   position: relative;
+}
+
+/* 共闘・パートナーカードの重なり表示 */
+.sheet-cards-container.has-partners {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.sheet-cards-container.has-partners .sheet-card-img-wrap:first-child {
+  position: absolute;
+  top: 3%;
+  left: 2%;
+  width: 76%;
+  height: auto;
+  z-index: 1;
+}
+
+.sheet-cards-container.has-partners .sheet-card-img-wrap:last-child {
+  position: absolute;
+  bottom: 5%;
+  right: 2%;
+  width: 76%;
+  height: auto;
+  z-index: 2;
 }
 
 .sheet-card-img-wrap {
@@ -713,22 +800,22 @@ select:focus, input:focus, textarea:focus {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.7vw;
+  gap: var(--preview-right-gap, 0.6vw);
   height: 100%;
   overflow: hidden;
 }
 
 .sheet-deck-title {
-  font-size: 0.95vw;
+  font-size: var(--preview-deck-title, 0.95vw);
   font-weight: 800;
   color: var(--accent-gold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .sheet-commander-names {
-  font-size: 1.5vw;
+  font-size: var(--preview-cmd-font, 1.5vw);
   font-weight: 900;
   line-height: 1.15;
   white-space: nowrap;
@@ -737,21 +824,21 @@ select:focus, input:focus, textarea:focus {
 }
 
 .sheet-cmd-desc {
-  font-size: 0.72vw;
+  font-size: calc(var(--preview-tag-font, 0.72vw) * 0.95);
   color: var(--text-secondary);
   font-style: italic;
-  margin-top: 4px;
+  margin-top: 3px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .sheet-power-row {
   display: flex;
-  gap: 12px;
-  margin: 1.5% 0;
+  gap: var(--preview-banner-gap, 12px);
+  margin: 1% 0;
   flex-shrink: 0;
 }
 
@@ -760,27 +847,27 @@ select:focus, input:focus, textarea:focus {
   background-color: var(--bracket-bg);
   border: 2px solid var(--bracket-border);
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: var(--preview-banner-pad, 8px 14px);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .bracket-num-badge {
-  font-size: 1.4vw;
+  font-size: var(--preview-banner-num, 1.4vw);
   font-weight: 900;
   color: var(--bracket-color);
   line-height: 1;
 }
 
 .bracket-name-title {
-  font-size: 0.95vw;
+  font-size: var(--preview-banner-name, 0.95vw);
   font-weight: 800;
   margin-top: 2px;
 }
 
 .bracket-turn-estimate {
-  font-size: 0.7vw;
+  font-size: calc(var(--preview-tag-font, 0.7vw) * 0.9);
   color: var(--text-secondary);
 }
 
@@ -789,102 +876,177 @@ select:focus, input:focus, textarea:focus {
   background-color: rgba(255, 255, 255, 0.04);
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  padding: 8px 14px;
+  padding: var(--preview-banner-pad, 8px 14px);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.sheet-gc-box.is-gc-warning {
+  background-color: rgba(239, 68, 68, 0.18);
+  border-color: #ef4444;
+}
+
+.sheet-gc-box.is-gc-warning .gc-header-label {
+  color: #f87171;
+  font-weight: 800;
+}
+
+.sheet-gc-box.is-gc-warning .gc-number-count {
+  color: #ef4444;
 }
 
 .gc-header-label {
-  font-size: 0.65vw;
+  font-size: calc(var(--preview-tag-font, 0.65vw) * 0.92);
   font-weight: 700;
   color: var(--text-secondary);
   letter-spacing: 0.05em;
 }
 
 .gc-number-count {
-  font-size: 1.6vw;
+  font-size: var(--preview-gc-num, 1.6vw);
   font-weight: 900;
   color: var(--accent-blue);
   line-height: 1;
 }
 
 .gc-source-tag {
-  font-size: 0.65vw;
+  font-size: calc(var(--preview-tag-font, 0.65vw) * 0.88);
   color: var(--text-muted);
 }
 
 .sheet-section {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   flex-shrink: 0;
 }
 
 .sheet-section-title {
-  font-size: 0.75vw;
+  font-size: var(--preview-section-title, 0.75vw);
   font-weight: 800;
   letter-spacing: 0.04em;
   color: var(--text-secondary);
   text-transform: uppercase;
 }
 
+/* タグ一覧（省略せず全件表示、折り返し） */
 .sheet-tags-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  max-height: 4.8vw;
-  overflow: hidden;
+  gap: var(--preview-tag-gap, 6px);
+  overflow: visible;
 }
 
 .sheet-tag {
-  font-size: 0.7vw;
+  font-size: var(--preview-tag-font, 0.7vw);
   font-weight: 700;
-  padding: 3px 9px;
+  padding: var(--preview-tag-padding, 3px 9px);
   border-radius: 4px;
   white-space: nowrap;
-  line-height: 1.5;
+  line-height: 1.45;
+  transition: transform 0.1s ease;
 }
 
+/* 通常の特徴タグ（シアン系） */
 .feature-tag {
   background-color: rgba(56, 189, 248, 0.15);
   color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+}
+.theme-light .feature-tag {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #0284c7;
 }
 
-.pref-tag {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: #4ade80;
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.avoid-tag {
-  background-color: rgba(239, 68, 68, 0.15);
+/* 最重要注意タグ（無限コンボ・2枚コンボ・スタックス・土地破壊・追加ターン等：赤/ローズ系で目立たせる） */
+.sheet-tag.caution-severe {
+  background-color: rgba(239, 68, 68, 0.22);
   color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.4);
+  border: 1px solid rgba(239, 68, 68, 0.7);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.2);
+}
+.theme-light .sheet-tag.caution-severe {
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-color: #ef4444;
 }
 
+/* 注意タグ（コンボ中心・プロキシあり・全体除去多め・打ち消し等：アンバー/オレンジ系） */
+.sheet-tag.caution-warning {
+  background-color: rgba(245, 158, 11, 0.22);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.7);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.2);
+}
+.theme-light .sheet-tag.caution-warning {
+  background-color: #fef3c7;
+  color: #b45309;
+  border-color: #f59e0b;
+}
+
+/* ポジティブな対戦希望タグ（エメラルドグリーン系） */
+.pref-tag {
+  background-color: rgba(16, 185, 129, 0.18);
+  color: #4ade80;
+  border: 1px solid rgba(16, 185, 129, 0.55);
+}
+.theme-light .pref-tag {
+  background-color: #dcfce7;
+  color: #15803d;
+  border-color: #16a34a;
+}
+
+/* 避けたい展開タグ（注意赤系） */
+.avoid-tag {
+  background-color: rgba(244, 63, 94, 0.22);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.7);
+}
+.theme-light .avoid-tag {
+  background-color: #ffe4e6;
+  color: #e11d48;
+  border-color: #f43f5e;
+}
+
+/* 詳細モード項目グリッド */
 .sheet-detail-grid {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  margin: 5px 0;
+  gap: 4px;
+  margin: 3px 0;
   flex-shrink: 0;
 }
 
 .detail-item {
-  font-size: 0.72vw;
+  font-size: var(--preview-detail-font, 0.72vw);
   display: flex;
   gap: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.5;
+  line-height: 1.45;
 }
 
 .detail-label {
   font-weight: 700;
   color: var(--text-secondary);
+}
+
+.detail-item.detail-win .detail-label {
+  color: #38bdf8;
+}
+
+.detail-item.detail-combo .detail-label {
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.detail-item.detail-proxy .detail-label {
+  color: #c084fc;
+  font-weight: 800;
 }
 
 .detail-value {
@@ -897,9 +1059,9 @@ select:focus, input:focus, textarea:focus {
 .sheet-notes-box {
   background-color: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 4px;
-  font-size: 0.7vw;
+  font-size: var(--preview-notes-font, 0.7vw);
   display: flex;
   gap: 6px;
   align-items: center;
@@ -916,7 +1078,7 @@ select:focus, input:focus, textarea:focus {
   font-size: 0.6vw;
   color: var(--text-muted);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 6px;
+  padding-top: 5px;
   margin-top: auto;
   flex-shrink: 0;
 }
@@ -1159,14 +1321,50 @@ select:focus, input:focus, textarea:focus {
     aspect-ratio: 16 / 9;
   }
 
-  .sheet-deck-title { font-size: 1.8vw; }
-  .sheet-commander-names { font-size: 2.8vw; }
-  .bracket-num-badge { font-size: 2.6vw; }
-  .bracket-name-title { font-size: 1.8vw; }
-  .gc-number-count { font-size: 3vw; }
-  .sheet-section-title { font-size: 1.5vw; }
-  .sheet-tag { font-size: 1.4vw; }
-  .detail-item { font-size: 1.4vw; }
+  .sheet-preview-card.density-standard {
+    --preview-tag-font: 1.4vw;
+    --preview-tag-padding: 3px 8px;
+    --preview-detail-font: 1.4vw;
+    --preview-section-title: 1.5vw;
+    --preview-cmd-font: 2.8vw;
+    --preview-deck-title: 1.8vw;
+    --preview-banner-num: 2.6vw;
+    --preview-banner-name: 1.8vw;
+    --preview-gc-num: 3vw;
+  }
+
+  .sheet-preview-card.density-dense {
+    --preview-tag-font: 1.2vw;
+    --preview-tag-padding: 2px 6px;
+    --preview-detail-font: 1.25vw;
+    --preview-section-title: 1.35vw;
+    --preview-cmd-font: 2.4vw;
+    --preview-deck-title: 1.6vw;
+    --preview-banner-num: 2.3vw;
+    --preview-banner-name: 1.5vw;
+    --preview-gc-num: 2.6vw;
+  }
+
+  .sheet-preview-card.density-extra-dense {
+    --preview-tag-font: 1.05vw;
+    --preview-tag-padding: 1.5px 5px;
+    --preview-detail-font: 1.1vw;
+    --preview-section-title: 1.2vw;
+    --preview-cmd-font: 2.1vw;
+    --preview-deck-title: 1.4vw;
+    --preview-banner-num: 2.0vw;
+    --preview-banner-name: 1.3vw;
+    --preview-gc-num: 2.3vw;
+  }
+
+  .sheet-deck-title { font-size: var(--preview-deck-title, 1.8vw); }
+  .sheet-commander-names { font-size: var(--preview-cmd-font, 2.8vw); }
+  .bracket-num-badge { font-size: var(--preview-banner-num, 2.6vw); }
+  .bracket-name-title { font-size: var(--preview-banner-name, 1.8vw); }
+  .gc-number-count { font-size: var(--preview-gc-num, 3vw); }
+  .sheet-section-title { font-size: var(--preview-section-title, 1.5vw); }
+  .sheet-tag { font-size: var(--preview-tag-font, 1.4vw); }
+  .detail-item { font-size: var(--preview-detail-font, 1.4vw); }
   .sheet-footer { font-size: 1.2vw; }
 }
 

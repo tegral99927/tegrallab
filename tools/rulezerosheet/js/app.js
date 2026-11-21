@@ -710,9 +710,19 @@ function updateModeUI() {
     elements.detailedSection.style.display = isSimple ? "none" : "block";
   }
 
-  // クイックシート/詳細シートの初期推奨
-  if (isSimple && state.activeDeck.sheetType !== "quick") {
-    state.updateDeck({ sheetType: "quick" });
+  // 詳細モードに切り替えたときは、シートタイプも詳細シートに自動同期
+  if (isSimple) {
+    if (state.activeDeck.sheetType !== "quick") {
+      state.updateDeck({ sheetType: "quick" });
+    }
+  } else {
+    if (state.activeDeck.sheetType !== "detailed") {
+      state.updateDeck({ sheetType: "detailed" });
+    }
+  }
+
+  if (elements.sheetTypeSelect) {
+    elements.sheetTypeSelect.value = state.activeDeck.sheetType || (isSimple ? "quick" : "detailed");
   }
 }
 
