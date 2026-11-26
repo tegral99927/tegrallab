@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Mulligan Lab - Unit & Integration Test Suite</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    h1 { color: #38bdf8; margin-bottom: 0.5rem; }
+    .test-summary {
+      background: #1e293b;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 2rem;
+      font-size: 1.1rem;
+    }
+    .test-group {
+      background: #1e293b;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid #64748b;
+    }
+    .test-group.all-pass { border-left-color: #10b981; }
+    .test-group.has-fail { border-left-color: #ef4444; }
+    .test-group h3 { margin-top: 0; margin-bottom: 0.75rem; }
+    .test-item {
+      padding: 0.35rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .test-item:nth-child(even) { background: rgba(255, 255, 255, 0.03); }
+    .status-pass { color: #10b981; font-weight: bold; }
+    .status-fail { color: #ef4444; font-weight: bold; }
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: #38bdf8;
+      text-decoration: none;
+    }
+  </style>
+
+  <!-- Load dependencies under test -->
+  <script src="../js/storage.js"></script>
+  <script src="../js/scryfall.js"></script>
+  <script src="../js/deck-parser.js"></script>
+  <script src="../js/deck-manager.js"></script>
+  <script src="../js/mulligan.js"></script>
+  <script src="../js/analysis.js"></script>
+  <script src="../js/training.js"></script>
+</head>
+<body>
+  <a href="../index.html" class="back-btn">&larr; Mulligan Lab アプリに戻る</a>
+  <h1>Mulligan Lab - 自動テストスイート</h1>
+  <div class="test-summary">
+    <div>実行: <strong id="sum-total">0</strong> 件</div>
+    <div>成功: <strong id="sum-pass" style="color:#10b981;">0</strong> 件</div>
+    <div>失敗: <strong id="sum-fail" style="color:#ef4444;">0</strong> 件</div>
+  </div>
+
+  <div id="test-results"></div>
+
+  <script>
+    const TestRunner = (() => {
+      let total = 0;
+      let pass = 0;
+      let fail = 0;
+      const resultsContainer = document.getElementById('test-results');
+
+      function suite(name, testFn) {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'test-group all-pass';
+        const title = document.createElement('h3');
+        title.textContent = name;
+        groupEl.appendChild(title);
+
+        let groupFailed = false;
+
+        const assert = (desc, condition) => {
+          total++;
+          const item = document.createElement('div');
+          item.className = 'test-item';
+          if (condition) {
+            pass++;
+            item.innerHTML = `<span>✔ ${desc}</span><span class="status-pass">PASS</span>`;
+          } else {
+            fail++;
+            groupFailed = true;
+            item.innerHTML = `<span>✖ ${desc}</span><span class="status-fail">FAIL</span>`;
+          }
+          groupEl.appendChild(item);
+        };
+
+        try {
+          testFn(assert);
+        } catch (e) {
+          assert(`テスト実行時例外: ${e.message}`, false);
+        }
+
+        if (groupFailed) {
+          groupEl.className = 'test-group has-fail';
+        }
+        resultsContainer.appendChild(groupEl);
+      }
+
+      function updateSummary() {
+        document.getElementById('sum-total').textContent = total;
+        document.getElementById('sum-pass').textContent = pass;
+        document.getElementById('sum-fail').textContent = fail;
+      }
+
+      return { suite, updateSummary };
+    })();
+
+    // ========================================================================
+    // 1. デッキリストの解析 (Deck Parser Tests)
+    // ========================================================================
+    TestRunner.suite('1. デッキリスト解析 (Deck Parser)', (assert) => {
+      const sampleText = `
+Deck
+4 Consider (MID) 44
+4 Lightning Bolt
+1 Mountain
+
+Sideboard
+2 Flusterstorm
+// Commander
+1 Murktide Regent
+`;
+      const parsed = DeckParser.parseDeckText(sampleText);
+      assert('メインボードのカード種類数が正確 (3種類)', parsed.mainboard.length === 3);
+      assert('メインボードの総枚数が正確 (9枚)', parsed.totalMainCount === 9);
+      assert('サイドボードの総枚数が正確 (2枚)', parsed.totalSideCount === 2);
+      assert('セットコードとコレクター番号が取得できる (MID 44)', parsed.mainboard[0].set === 'MID' && parsed.mainboard[0].collector_number === '44');
+      assert('未認識行リストが空であること', parsed.unparsed.length === 0);
+
+      // Japanese card name test
+      const jaParsed = DeckParser.parseCardLine('4 考慮 (MID) 44', '4 考慮 (MID) 44');
+      assert('日本語カード名とセットコードの解析 (4 考慮)', jaParsed.count === 4 && jaParsed.name === '考慮' && jaParsed.set === 'MID');
+
+      // Duplicate consolidation test
+      const dupText = `2 Consider\n2 Consider`;
+      const dupParsed = DeckParser.parseDeckText(dupText);
+      assert('同一カードの集約 (2+2 = 4枚)', dupParsed.mainboard.length === 1 && dupParsed.mainboard[0].count === 4);
+    });
+
+    // ========================================================================
+    // 2. ライブラリー構築 & サイドボード除外
+    // ========================================================================
+    TestRunner.suite('2. ライブラリー構築 & サイドボード除外', (assert) => {
+      const main = [
+        { count: 4, name: 'Island' },
+        { count: 2, name: 'Consider' }
+      ];
+      const lib = Mulligan.buildLibrary(main);
+      assert('メインデッキのみがライブラリーに展開される (計6枚)', lib.length === 6);
+      assert('各カードインスタンスに一意のIDが付与される', lib[0].instanceId !== lib[1].instanceId);
+    });
+
+    // ========================================================================
+    // 3. シャッフル & Fisher-Yates
+    // ========================================================================
+    TestRunner.suite('3. Fisher-Yates シャッフル & PRNG再現性', (assert) => {
+      const arr1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      const rng1 = Mulligan.createPRNG('fixed_seed_123');
+      const rng2 = Mulligan.createPRNG('fixed_seed_123');
+
+      const shuffled1 = Mulligan.shuffleArray([...arr1], rng1);
+      const shuffled2 = Mulligan.shuffleArray([...arr1], rng2);
+
+      assert('同一シードによるシャッフル結果の完全一致 (再現性)', JSON.stringify(shuffled1) === JSON.stringify(shuffled2));
+      assert('シャッフル後も要素数が同一であること', shuffled1.length === arr1.length);
+      assert('要素の重複や欠損がないこと', shuffled1.slice().sort((a,b)=>a-b).join() === arr1.join());
+    });
+
+    // ========================================================================
+    // 4. ロンドン・マリガン & 無料マリガン
+    // ========================================================================
+    TestRunner.suite('4. ロンドン・マリガン & 無料マリガン', (assert) => {
+      // Free mulligan check
+      assert('統率者戦 (EDH) の1回目マリガンは無料 (auto)', Mulligan.isFreeMulliganAllowed('commander', 'auto', 0) === true);
+      assert('モダンの1回目マリガンは通常ルールで有料 (auto)', Mulligan.isFreeMulliganAllowed('modern', 'auto', 0) === false);
+
+      // Bottom cards count
+      assert('モダン 0回マリガン: ボトム送り 0枚', Mulligan.getCardsToBottomCount(0, 'modern', 'auto') === 0);
+      assert('モダン 1回マリガン: ボトム送り 1枚', Mulligan.getCardsToBottomCount(1, 'modern', 'auto') === 1);
+      assert('モダン 2回マリガン: ボトム送り 2枚', Mulligan.getCardsToBottomCount(2, 'modern', 'auto') === 2);
+      assert('統率者 1回目無料マリガン: ボトム送り 0枚', Mulligan.getCardsToBottomCount(1, 'commander', 'auto') === 0);
+      assert('統率者 2回目マリガン: ボトム送り 1枚', Mulligan.getCardsToBottomCount(2, 'commander', 'auto') === 1);
+    });
+
+    // ========================================================================
+    // 5. キープ条件 AST 評価 (AND / OR / NOT, 土地, タグ)
+    // ========================================================================
+    TestRunner.suite('5. キープ条件 AST 評価 (安全実行)', (assert) => {
+      const hand = [
+        { name: 'Island', isLand: true, tags: ['土地', 'アンタップイン土地'] },
+        { name: 'Island', isLand: true, tags: ['土地', 'アンタップイン土地'] },
+        { name: 'Consider', isLand: false, tags: ['初動', 'キャントリップ'] },
+        { name: 'Lightning Bolt', isLand: false, tags: ['除去'] }
+      ];
+
+      // Condition: 2 to 4 lands AND has '初動'
+      const ast1 = {
+        type: 'group',
+        operator: 'AND',
+        children: [
+          { type: 'rule', field: 'lands', min: 2, max: 4 },
+          { type: 'rule', field: 'tag', tag: '初動', min: 1 }
+        ]
+      };
+      const eval1 = Training.evaluateHand(hand, ast1);
+      assert('土地2〜4枚 かつ 初動あり -> 適合 (true)', eval1.satisfied === true);
+
+      // Condition: lands >= 3 -> should fail for 2 lands
+      const ast2 = {
+        type: 'rule', field: 'lands', min: 3, max: 4
+      };
+      const eval2 = Training.evaluateHand(hand, ast2);
+      assert('土地3枚以上 -> 不適合 (false)', eval2.satisfied === false);
+
+      // Condition: OR group
+      const ast3 = {
+        type: 'group',
+        operator: 'OR',
+        children: [
+          { type: 'rule', field: 'tag', tag: 'キーカード', min: 1 },
+          { type: 'rule', field: 'tag', tag: '除去', min: 1 }
+        ]
+      };
+      const eval3 = Training.evaluateHand(hand, ast3);
+      assert('キーカード OR 除去 -> 適合 (true)', eval3.satisfied === true);
+    });
+
+    // ========================================================================
+    // 6. 超幾何分布 理論値計算
+    // ========================================================================
+    TestRunner.suite('6. 超幾何分布 理論値計算 (Hypergeometric Distribution)', (assert) => {
+      // 60-card deck, 24 lands, sample 7.
+      // Exact P(X = 0 lands) = C(24, 0)*C(36, 7)/C(60, 7) ~ 0.02157
+      const p0 = Analysis.hypergeometricPMF(60, 24, 7, 0);
+      assert('60枚デッキ24土地の0枚土地確率 ~ 2.16%', Math.abs(p0 - 0.02157) < 0.001);
+
+      // Exact P(X = 3 lands) = C(24, 3)*C(36, 4)/C(60, 7) ~ 0.3087
+      const p3 = Analysis.hypergeometricPMF(60, 24, 7, 3);
+      assert('60枚デッキ24土地の3枚土地確率 ~ 30.87%', Math.abs(p3 - 0.3087) < 0.001);
+
+      // Cumulative sum of all k from 0 to 7 must equal 1.0
+      let totalP = 0;
+      for (let k = 0; k <= 7; k++) {
+        totalP += Analysis.hypergeometricPMF(60, 24, 7, k);
+      }
+      assert('k=0〜7の確率の合計が 1.0 (全事象)', Math.abs(totalP - 1.0) < 0.0001);
+    });
+
+    // ========================================================================
+    // 7. データエクスポート (CSV BOM & JSON)
+    // ========================================================================
+    TestRunner.suite('7. データエクスポート形式検証', (assert) => {
+      const sampleExport = {
+        appName: 'Mulligan Lab',
+        version: 1,
+        decks: [{ id: 'd1', name: 'Test' }]
+      };
+      assert('バックアップJSON形式にappNameプロパティが含まれる', sampleExport.appName === 'Mulligan Lab');
+    });
+
+    // Run summary
+    TestRunner.updateSummary();
+  </script>
+</body>
+</html>

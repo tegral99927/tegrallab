@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <!-- Google Analytics (Tegral Lab Common) -->
+  <script src="/asset/js/gtag.js"></script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Mulligan Lab | MTG初期手札・マリガン分析ツール</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="MTGの初期手札とマリガンをトレーニング・分析できる無料Webツール。デッキリストをインポートし、キーカードの出現率、土地事故率、コンボの再現性、マリガン戦略をシミュレーションできます。">
+  <meta name="keywords" content="MTG, マジック：ザ・ギャザリング, マリガン, 初期手札, ロンドンマリガン, シミュレーション, 超幾何分布, デッキ構築, 統率者戦, EDH, モダン, パイオニア, スタンダード, Scryfall, Tegral Lab">
+  <meta name="author" content="Tegral Lab">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="theme-color" content="#0a0d14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mulligan Lab">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://tegrallab.com/tools/mulligan-lab/">
+
+  <!-- Favicons & Icons -->
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/favicon.svg">
+
+  <!-- OGP (Open Graph Protocol) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tegral Lab">
+  <meta property="og:title" content="Mulligan Lab | MTG初期手札・マリガン分析ツール">
+  <meta property="og:description" content="MTGの初期手札とマリガンをトレーニング・分析できる無料Webツール。デッキリストをインポートし、実カード画像での手札判断、超幾何分布の理論値、最大10万回のモンテカルロシミュレーションを実行可能。">
+  <meta property="og:url" content="https://tegrallab.com/tools/mulligan-lab/">
+  <meta property="og:image" content="https://tegrallab.com/tools/mulligan-lab/assets/images/ogp.svg">
+  <meta property="og:image:type" content="image/svg+xml">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Mulligan Lab - MTG初期手札・マリガン分析ツール">
+  <meta property="og:locale" content="ja_JP">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@tegrallab">
+  <meta name="twitter:creator" content="@tegrallab">
+  <meta name="twitter:title" content="Mulligan Lab | MTG初期手札・マリガン分析ツール">
+  <meta name="twitter:description" content="MTGの初期手札とマリガンをトレーニング・分析できる無料Webツール。実カード画像での練習、超幾何分布理論値、自動マリガンシミュレーション搭載。">
+  <meta name="twitter:image" content="https://tegrallab.com/tools/mulligan-lab/assets/images/ogp.svg">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <!-- JSON-LD Structured Data for Rich Snippets -->
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Mulligan Lab",
+      "alternateName": "MTG初期手札・マリガン分析ツール",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "All",
+      "url": "https://tegrallab.com/tools/mulligan-lab/",
+      "description": "Magic: The Gatheringの初期手札とロンドン・マリガンのトレーニングおよび超幾何分布・モンテカルロ法による統計的分析を行う静的Webアプリケーション。",
+      "image": "https://tegrallab.com/tools/mulligan-lab/assets/images/ogp.svg",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "JPY"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Tegral Lab",
+        "url": "https://tegrallab.com"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "ホーム",
+          "item": "https://tegrallab.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "ツール一覧",
+          "item": "https://tegrallab.com/pages/tools.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Mulligan Lab",
+          "item": "https://tegrallab.com/tools/mulligan-lab/"
+        }
+      ]
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Mulligan Labは無料で使えますか？登録は必要ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "はい、完全無料でユーザー登録やログインも不要です。すべての処理はブラウザ内で完結します。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "どのマリガンルールに対応していますか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MTG公式のロンドン・マリガン（London Mulligan）に完全対応しています。キープ時に有償マリガン回数と同じ枚数のカードをライブラリーの一番下へ配置する処理を正確にシミュレートできます。統率者戦（EDH）やブロールにおける初回無料マリガン設定も可能です。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "対応しているデッキリスト形式は何ですか？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MTG Arena形式、MTGO形式、一般的なテキスト形式、日本語・英語カード名、セットコード付き形式、テキストファイル（.txt, .dec）のインポートに対応しています。"
+          }
+        }
+      ]
+    }
+  ]
+  </script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand-section">
+          <a href="/pages/tools.html" class="back-link" title="ツール一覧に戻る">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>ツール一覧</span>
+          </a>
+          <div class="brand-title-wrap">
+            <img src="assets/icons/favicon.svg" alt="Mulligan Lab Logo" class="brand-icon">
+            <div>
+              <h1 class="brand-title">Mulligan Lab</h1>
+              <div class="brand-subtitle">MTG初期手札・マリガン分析ツール</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="active-deck-badge" id="header-active-deck-badge" title="選択中のデッキ">
+            <span class="active-deck-name" id="header-deck-name">デッキ未読込</span>
+            <span class="active-deck-count" id="header-deck-count">0枚</span>
+          </div>
+
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-lang-toggle" title="カード言語切替 (日本語 / 英語)">
+            <span id="lang-btn-text">🇯🇵 日本語</span>
+          </button>
+
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-theme-toggle" aria-label="テーマ切替">
+            <span id="theme-icon">🌙</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Navigation Tabs -->
+      <nav class="app-nav" aria-label="主要ナビゲーション">
+        <div class="nav-tabs" role="tablist">
+          <button type="button" class="nav-tab-btn active" role="tab" data-tab="tab-deck" id="nav-tab-deck">
+            <span>🎴 デッキ管理</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-training" id="nav-tab-training">
+            <span>🎯 トレーニング</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-analysis" id="nav-tab-analysis">
+            <span>📊 初期手札分析</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-simulation" id="nav-tab-simulation">
+            <span>⚙️ 自動マリガン</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-roles" id="nav-tab-roles">
+            <span>🏷️ 役割・タグ設定</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-history" id="nav-tab-history">
+            <span>📜 履歴・復習</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-compare" id="nav-tab-compare">
+            <span>⚖️ デッキ比較</span>
+          </button>
+          <button type="button" class="nav-tab-btn" role="tab" data-tab="tab-settings" id="nav-tab-settings">
+            <span>⚙️ 設定</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- ===================================================================
+           TAB 1: デッキ管理 (Deck Management)
+           =================================================================== -->
+      <section class="tab-pane active" id="tab-deck" role="tabpanel">
+        <div class="deck-view-grid">
+          <!-- Left: Deck Import & Controls -->
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">デッキリストのインポート</h2>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-load-sample-deck">サンプル読込</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-deck-input">クリア</button>
+              </div>
+            </div>
+
+            <div class="deck-import-box">
+              <div class="form-row">
+                <div class="form-col">
+                  <label class="form-label" for="deck-format-select">フォーマット</label>
+                  <select id="deck-format-select" class="form-select">
+                    <option value="standard">スタンダード (60枚)</option>
+                    <option value="pioneer">パイオニア (60枚)</option>
+                    <option value="modern" selected>モダン (60枚)</option>
+                    <option value="legacy">レガシー (60枚)</option>
+                    <option value="vintage">ヴィンテージ (60枚)</option>
+                    <option value="pauper">パウパー (60枚)</option>
+                    <option value="commander">統率者戦 / EDH (100枚)</option>
+                    <option value="brawl">ブロール (60/100枚)</option>
+                    <option value="historic">ヒストリック (60枚)</option>
+                    <option value="timeless">タイムレス (60枚)</option>
+                    <option value="limited">リミテッド (40枚)</option>
+                    <option value="custom">カスタム</option>
+                  </select>
+                </div>
+                <div class="form-col">
+                  <label class="form-label" for="deck-name-input">デッキ名</label>
+                  <input type="text" id="deck-name-input" class="form-control" placeholder="例: Izzet Murktide" value="Izzet Murktide">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="deck-import-textarea">
+                  デッキリスト貼り付け（MTG Arena / MTGO / 日本語・英語 / テキスト形式）
+                </label>
+                <textarea id="deck-import-textarea" class="form-textarea" placeholder="4 Consider
+4 Lightning Bolt
+4 Counterspell
+...
+Sideboard
+2 Flusterstorm"></textarea>
+              </div>
+
+              <!-- File Upload Dropzone -->
+              <div class="file-dropzone" id="deck-file-dropzone">
+                <p>📄 テキストファイル (.txt, .dec) をドラッグ＆ドロップ または クリックして選択</p>
+                <input type="file" id="deck-file-input" accept=".txt,.dec" style="display: none;">
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <button type="button" class="btn btn-primary" id="btn-parse-and-import">
+                  <span id="import-btn-text">リスト解析 & Scryfall取得</span>
+                </button>
+                <button type="button" class="btn btn-success" id="btn-save-current-deck">デッキ保存</button>
+                <span id="import-status-text" class="text-muted" style="font-size: 0.85rem;"></span>
+              </div>
+
+              <!-- Unparsed Warning Box -->
+              <div id="unparsed-warning-container" class="unparsed-warning-box" style="display: none;">
+                <strong>⚠️ 認識できなかった行・カードがあります:</strong>
+                <ul id="unparsed-list" style="margin-top: 0.5rem; padding-left: 1.25rem;"></ul>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-open-fix-unparsed" style="margin-top: 0.5rem;">手動で修正する</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Deck Contents & Saved Decks -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title">現在のメインデッキ</h2>
+                <span class="panel-subtitle" id="deck-count-summary">総枚数: 0枚 (土地: 0, 呪文: 0)</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-export-deck-text">エクスポート</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-show-saved-decks">保存済みデッキ</button>
+              </div>
+            </div>
+
+            <!-- Saved Decks Dropdown / Drawer (hidden by default) -->
+            <div id="saved-decks-selector-panel" style="display: none; margin-bottom: 1rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+              <label class="form-label">保存済みデッキ一覧</label>
+              <div style="display: flex; gap: 0.5rem;">
+                <select id="saved-decks-select" class="form-select"></select>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-load-selected-deck">開く</button>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-delete-selected-deck">削除</button>
+              </div>
+            </div>
+
+            <div class="deck-list-container" id="current-deck-cards-list">
+              <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                左側のエリアからデッキをインポートしてください
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 2: マリガントレーニング (Mulligan Training Mode)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-training" role="tabpanel">
+        <div class="training-layout">
+          <!-- Training Toolbar -->
+          <div class="training-toolbar">
+            <div class="training-info-stats">
+              <div class="stat-pill">
+                <span class="stat-pill-label">手札枚数</span>
+                <span class="stat-pill-value" id="train-hand-count">7</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">マリガン回数</span>
+                <span class="stat-pill-value" id="train-mulligan-count">0</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">ライブラリー残</span>
+                <span class="stat-pill-value" id="train-library-count">53</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">土地枚数</span>
+                <span class="stat-pill-value" id="train-land-count">0</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">ボトム送り必要</span>
+                <span class="stat-pill-value" id="train-bottom-needed" style="color: var(--danger);">0</span>
+              </div>
+              <div class="stat-pill">
+                <span class="stat-pill-label">先攻/後攻</span>
+                <span class="stat-pill-value" id="train-turn-order">先攻</span>
+              </div>
+            </div>
+
+            <div class="training-actions">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-toggle-play-draw">先攻/後攻切替</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-random-play-draw">🎲 ランダム</button>
+              <div style="display: flex; align-items: center; gap: 0.35rem; margin-left: 0.5rem;">
+                <label for="training-mode-toggle" style="font-size: 0.85rem; font-weight: 600; cursor: pointer;">ブラインドモード</label>
+                <input type="checkbox" id="training-mode-toggle" style="cursor: pointer;">
+              </div>
+            </div>
+          </div>
+
+          <!-- Hand Cards Area -->
+          <div class="hand-area-wrapper">
+            <!-- Bottom selection guide message -->
+            <div id="bottom-selection-prompt" class="bottom-selection-prompt" style="display: none;">
+              ライブラリーの一番下に送るカードを <span id="bottom-cards-needed-text">0</span> 枚タップして選択してください
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="hand-cards-grid" id="training-hand-cards">
+              <!-- Rendered card elements -->
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-danger btn-lg" id="btn-do-mulligan" style="min-width: 160px;">
+              🔄 マリガン
+            </button>
+            <button type="button" class="btn btn-success btn-lg" id="btn-do-keep" style="min-width: 160px;">
+              ✅ キープ
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" id="btn-do-new-game" style="min-width: 140px;">
+              ✨ 新しいゲーム
+            </button>
+          </div>
+
+          <!-- Turn Advancement Bar (Active after Keep) -->
+          <div class="panel" id="training-post-keep-panel" style="display: none; background: var(--bg-secondary);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <strong>ターン経過:</strong> 現在 <span id="current-training-turn">ターン 1</span>
+                (<span id="turn-draw-notice">ドローなし</span>)
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-primary btn-sm" id="btn-draw-one-card">1枚引く (次のターン)</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-advance-to-turn-3">第3ターンまで進める</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-advance-to-turn-5">第5ターンまで進める</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Training Insights & Feedback Section -->
+          <div class="training-insights">
+            <!-- Left: Evaluation against Keep Conditions -->
+            <div class="condition-check-box" id="training-condition-feedback-box">
+              <h3 style="font-size: 0.95rem; margin-bottom: 0.5rem;">🎯 キープ条件の達成状況</h3>
+              <div id="training-condition-feedback-list">
+                <!-- Status items populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Right: Reasoning & Notes Form -->
+            <div class="reasoning-panel">
+              <div class="form-group" style="margin-bottom: 0.5rem;">
+                <label class="form-label" for="train-opponent-archetype">想定対戦相手のアーキタイプ</label>
+                <select id="train-opponent-archetype" class="form-select">
+                  <option value="unknown">不明 / 一般</option>
+                  <option value="aggro">アグロ</option>
+                  <option value="midrange">ミッドレンジ</option>
+                  <option value="control">コントロール</option>
+                  <option value="combo">コンボ</option>
+                  <option value="ramp">ランプ</option>
+                  <option value="tempo">テンポ</option>
+                  <option value="custom">カスタム</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0.5rem;">
+                <label class="form-label">判断理由（複数選択可）</label>
+                <div class="reason-chips-grid" id="training-reasons-chips">
+                  <span class="reason-chip" data-reason="土地枚数が適切">土地枚数が適切</span>
+                  <span class="reason-chip" data-reason="土地が不足している">土地が不足している</span>
+                  <span class="reason-chip" data-reason="土地が多すぎる">土地が多すぎる</span>
+                  <span class="reason-chip" data-reason="必要な色マナが不足している">必要な色マナ不足</span>
+                  <span class="reason-chip" data-reason="キーカードが存在する">キーカードあり</span>
+                  <span class="reason-chip" data-reason="キーカードが不足している">キーカード不足</span>
+                  <span class="reason-chip" data-reason="コンボパーツが揃っている">コンボパーツ揃う</span>
+                  <span class="reason-chip" data-reason="初動が存在する">初動あり</span>
+                  <span class="reason-chip" data-reason="初動が存在しない">初動なし</span>
+                  <span class="reason-chip" data-reason="妨害手段が存在する">妨害手段あり</span>
+                  <span class="reason-chip" data-reason="マナカーブが悪い">マナカーブ悪</span>
+                  <span class="reason-chip" data-reason="相手のデッキとの相性">相手との相性</span>
+                  <span class="reason-chip" data-reason="その他">その他</span>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="training-user-memo">メモ（任意）</label>
+                <input type="text" id="training-user-memo" class="form-control" placeholder="例: 相手が速いアグロ想定ならマリガンだが...">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 3: 初期手札分析 (Opening Hand Analysis)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-analysis" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">初期手札の統計分析 & 理論値（超幾何分布）</h2>
+              <span class="panel-subtitle">数学的な理論値とモンテカルロ推定値による7枚初期手札の確率分布</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-recalc-analysis">分析を再計算</button>
+            </div>
+          </div>
+
+          <div class="analysis-grid">
+            <!-- Card 1: 土地枚数分布 -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>🏞️ 初期手札の土地枚数分布</h3>
+                <span class="badge badge-primary">超幾何分布 理論値</span>
+              </div>
+              <div class="chart-container" id="chart-land-distribution"></div>
+              <table class="stats-table" style="margin-top: 1rem;">
+                <thead>
+                  <tr>
+                    <th>土地枚数</th>
+                    <th class="numeric">理論確率</th>
+                    <th class="numeric">累積確率(以上)</th>
+                  </tr>
+                </thead>
+                <tbody id="table-land-stats-body"></tbody>
+              </table>
+              <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+                <span>平均土地枚数: <strong id="stat-avg-lands" style="color: var(--text-primary);">-</strong> 枚</span>
+                <span>土地事故率 (&le;1枚または&ge;5枚): <strong id="stat-land-screw-flood" style="color: var(--warning);">-</strong>%</span>
+              </div>
+            </div>
+
+            <!-- Card 2: タグ・役割カードの出現率 -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>🏷️ 役割・タグ別の初期手札出現率</h3>
+                <span class="badge badge-accent">1枚以上引く確率</span>
+              </div>
+              <div class="chart-container" id="chart-tags-distribution"></div>
+              <table class="stats-table" style="margin-top: 1rem;">
+                <thead>
+                  <tr>
+                    <th>タグ / 役割</th>
+                    <th class="numeric">デッキ枚数</th>
+                    <th class="numeric">&ge;1枚確率</th>
+                    <th class="numeric">&ge;2枚確率</th>
+                  </tr>
+                </thead>
+                <tbody id="table-tags-stats-body"></tbody>
+              </table>
+            </div>
+
+            <!-- Card 3: マナカーブ & 色マナ供給 -->
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <h3>⚡ マナカーブ & マナ総量</h3>
+                <span class="badge badge-success">呪文のマナ総量分布</span>
+              </div>
+              <div class="chart-container" id="chart-mana-curve"></div>
+              <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
+                <span>呪文の平均CMC: <strong id="stat-avg-spell-cmc">-</strong></span>
+                <span>デッキ全体の平均CMC: <strong id="stat-avg-deck-cmc">-</strong></span>
+              </div>
+              <div style="margin-top: 0.75rem;">
+                <h4 style="font-size: 0.85rem; margin-bottom: 0.35rem; color: var(--text-secondary);">色マナ供給源の出現率</h4>
+                <div id="color-sources-stat-chips" style="display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Turn Progression Probability Simulation -->
+          <div class="turn-simulation-box">
+            <div class="panel-header" style="border-bottom: none; margin-bottom: 0.5rem; padding-bottom: 0;">
+              <div>
+                <h3 style="font-size: 1.05rem;">📈 ターン経過によるキーカード・土地の累積獲得確率</h3>
+                <span class="panel-subtitle">先攻・後攻の通常ドローを考慮したターン毎の累積確率推移</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <label class="form-label" style="margin-bottom: 0;">注目タグ/カード:</label>
+                <select id="turn-sim-target-select" class="form-select" style="width: auto;"></select>
+                <select id="turn-sim-play-draw-select" class="form-select" style="width: auto;">
+                  <option value="play">先攻 (T1ドローなし)</option>
+                  <option value="draw">後攻 (T1ドローあり)</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-container" id="chart-turn-progression" style="height: 260px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 4: マリガンシミュレーション (Automated Simulation)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-simulation" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">キープ条件ビルダー & 自動マリガンシミュレーション</h2>
+              <span class="panel-subtitle">設定したキープ条件に基づき、ロンドン・マリガンを数千〜数万回シミュレートします</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-open-condition-presets">プリセット保存/読込</button>
+            </div>
+          </div>
+
+          <!-- Condition Builder Area -->
+          <div class="condition-builder-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <h3 style="font-size: 1rem;">キープ判定ルール設定</h3>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-condition-rule">+ 条件を追加</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-add-condition-group">+ 条件グループ(OR/AND)を追加</button>
+              </div>
+            </div>
+
+            <!-- Conditions Tree Root Container -->
+            <div id="condition-builder-root" class="condition-group-node">
+              <!-- Dynamically populated rules & groups -->
+            </div>
+
+            <!-- Simulation Parameters Row -->
+            <div class="form-row" style="margin-top: 1.25rem; align-items: flex-end;">
+              <div class="form-col">
+                <label class="form-label" for="sim-iterations-select">シミュレーション回数</label>
+                <select id="sim-iterations-select" class="form-select">
+                  <option value="100">100 回 (超高速テスト)</option>
+                  <option value="1000" selected>1,000 回 (標準)</option>
+                  <option value="10000">10,000 回 (高精度)</option>
+                  <option value="50000">50,000 回 (最高精度)</option>
+                  <option value="custom">カスタム入力</option>
+                </select>
+              </div>
+
+              <div class="form-col" id="sim-custom-iter-wrap" style="display: none;">
+                <label class="form-label" for="sim-custom-iterations">カスタム回数</label>
+                <input type="number" id="sim-custom-iterations" class="form-control" value="20000" min="10" max="200000">
+              </div>
+
+              <div class="form-col">
+                <label class="form-label" for="sim-random-seed">乱数シード（任意）</label>
+                <input type="text" id="sim-random-seed" class="form-control" placeholder="空欄で完全ランダム">
+              </div>
+
+              <div class="form-col">
+                <label class="form-label" for="sim-max-mulligans">最大マリガン回数</label>
+                <select id="sim-max-mulligans" class="form-select">
+                  <option value="3">3回 (手札4枚まで)</option>
+                  <option value="4" selected>4回 (手札3枚まで)</option>
+                  <option value="5">5回 (手札2枚まで)</option>
+                  <option value="6">6回 (手札1枚まで)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn btn-primary" id="btn-run-simulation">
+                  ▶ シミュレーション開始
+                </button>
+                <button type="button" class="btn btn-danger" id="btn-cancel-simulation" style="display: none;">
+                  ⏹ 中断
+                </button>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="sim-progress-bar-container" id="sim-progress-bar-wrap" style="display: none;">
+              <div class="sim-progress-bar-fill" id="sim-progress-bar-fill"></div>
+            </div>
+            <div id="sim-progress-label" style="display: none; font-size: 0.8rem; color: var(--text-muted); text-align: right;"></div>
+          </div>
+
+          <!-- Simulation Results Panel -->
+          <div id="sim-results-panel" style="margin-top: 1.5rem; display: none;">
+            <div class="panel-header">
+              <h3 class="panel-title">📊 シミュレーション結果統計</h3>
+              <span id="sim-summary-timestamp" style="font-size: 0.85rem; color: var(--text-muted);"></span>
+            </div>
+
+            <div class="analysis-grid" style="margin-bottom: 1.5rem;">
+              <div class="chart-card">
+                <h4>キープ手札枚数の分布</h4>
+                <div class="chart-container" id="chart-sim-handsize"></div>
+              </div>
+              <div class="chart-card">
+                <h4>マリガン回数の分布</h4>
+                <div class="chart-container" id="chart-sim-mulligans"></div>
+              </div>
+            </div>
+
+            <!-- Key Metrics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+                <div class="stat-pill-label">7枚キープ率</div>
+                <div class="stat-pill-value" id="sim-stat-keep7" style="color: var(--success); font-size: 1.6rem;">-%</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);" id="sim-ci-keep7">95% CI: -</div>
+              </div>
+              <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+                <div class="stat-pill-label">キープ条件達成率</div>
+                <div class="stat-pill-value" id="sim-stat-success-rate" style="color: var(--primary-hover); font-size: 1.6rem;">-%</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">全体における成立割合</div>
+              </div>
+              <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+                <div class="stat-pill-label">平均キープ手札枚数</div>
+                <div class="stat-pill-value" id="sim-stat-avg-handsize" style="font-size: 1.6rem;">- 枚</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">最終手札の平均</div>
+              </div>
+              <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+                <div class="stat-pill-label">平均マリガン回数</div>
+                <div class="stat-pill-value" id="sim-stat-avg-mulligans" style="font-size: 1.6rem;">- 回</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">1ゲームあたりの平均</div>
+              </div>
+              <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+                <div class="stat-pill-label">強制キープ率 (未達)</div>
+                <div class="stat-pill-value" id="sim-stat-forced-keep" style="color: var(--danger); font-size: 1.6rem;">-%</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">上限到達による妥協</div>
+              </div>
+            </div>
+
+            <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+              ※ 注意: 本シミュレーション結果はユーザー設定のキープ条件に基づく統計的推定値であり、実際の対戦環境における勝率や最適手を保証するものではありません。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 5: カード役割・タグ設定 (Roles & Tags)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-roles" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">カードの役割・タグ設定</h2>
+              <span class="panel-subtitle">デッキの各カードに戦略的な役割タグを割り当てます</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-auto-tag-deck">自動分類を再適用</button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-open-create-tag-modal">+ 新規タグ作成</button>
+            </div>
+          </div>
+
+          <!-- Tags Palette / Filter Strip -->
+          <div style="margin-bottom: 1.25rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: var(--radius-md);">
+            <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.4rem;">タグ一覧（クリックして一括付与またはフィルタ）:</div>
+            <div id="roles-all-tags-palette" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+              <!-- Tag chips rendered here -->
+            </div>
+          </div>
+
+          <!-- Cards Table for Tagging -->
+          <div style="overflow-x: auto;">
+            <table class="stats-table" id="table-card-roles">
+              <thead>
+                <tr>
+                  <th style="width: 40px;"><input type="checkbox" id="roles-check-all"></th>
+                  <th style="width: 60px;">枚数</th>
+                  <th>カード名</th>
+                  <th>カードタイプ</th>
+                  <th>マナ</th>
+                  <th>割り当て済みタグ</th>
+                  <th style="width: 120px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="roles-cards-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 6: トレーニング履歴 & 復習モード (History & Review)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-history" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">マリガントレーニング履歴 & 統計</h2>
+              <span class="panel-subtitle">これまでの判断結果、キープ率、理由の分布を分析</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-export-history-csv">CSVエクスポート</button>
+              <button type="button" class="btn btn-danger btn-sm" id="btn-clear-history">履歴クリア</button>
+            </div>
+          </div>
+
+          <!-- History Aggregates -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+              <div class="stat-pill-label">総トレーニング回数</div>
+              <div class="stat-pill-value" id="hist-stat-total">0</div>
+            </div>
+            <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+              <div class="stat-pill-label">初手キープ率 (7枚)</div>
+              <div class="stat-pill-value" id="hist-stat-keep-rate">0%</div>
+            </div>
+            <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+              <div class="stat-pill-label">平均マリガン回数</div>
+              <div class="stat-pill-value" id="hist-stat-avg-mull">0.0</div>
+            </div>
+            <div class="panel" style="margin-bottom: 0; text-align: center; background: var(--bg-secondary);">
+              <div class="stat-pill-label">条件一致率</div>
+              <div class="stat-pill-value" id="hist-stat-match-rate">0%</div>
+            </div>
+          </div>
+
+          <!-- History Records Table -->
+          <div style="overflow-x: auto;">
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th>日時</th>
+                  <th>デッキ</th>
+                  <th>先攻/後攻</th>
+                  <th>想定相手</th>
+                  <th>マリガン回数</th>
+                  <th>最終手札</th>
+                  <th>判断</th>
+                  <th>主な理由</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="history-records-tbody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 7: デッキ比較 (Deck Comparison)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-compare" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">デッキ比較分析</h2>
+              <span class="panel-subtitle">2つのデッキやデッキバージョンのキープ率・土地事故率をパーセントポイント(pp)で比較</span>
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-run-deck-comparison">比較を実行</button>
+          </div>
+
+          <div class="form-row" style="margin-bottom: 1.5rem;">
+            <div class="form-col">
+              <label class="form-label" for="compare-deck-a-select">デッキ A</label>
+              <select id="compare-deck-a-select" class="form-select"></select>
+            </div>
+            <div class="form-col">
+              <label class="form-label" for="compare-deck-b-select">デッキ B (比較対象)</label>
+              <select id="compare-deck-b-select" class="form-select"></select>
+            </div>
+          </div>
+
+          <!-- Comparison Table and Chart -->
+          <div id="compare-results-area" style="display: none;">
+            <div class="chart-card" style="margin-bottom: 1.5rem;">
+              <h3>比較グラフ (主要指標)</h3>
+              <div class="chart-container" id="chart-compare-bars"></div>
+            </div>
+
+            <table class="stats-table">
+              <thead>
+                <tr>
+                  <th>比較指標</th>
+                  <th class="numeric">デッキ A</th>
+                  <th class="numeric">デッキ B</th>
+                  <th class="numeric">差分 (&Delta;)</th>
+                </tr>
+              </thead>
+              <tbody id="compare-table-tbody">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================================================================
+           TAB 8: 設定 (Settings)
+           =================================================================== -->
+      <section class="tab-pane" id="tab-settings" role="tabpanel">
+        <div class="panel" style="max-width: 800px; margin: 0 auto;">
+          <div class="panel-header">
+            <h2 class="panel-title">アプリケーション設定 & データ管理</h2>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-card-language">カード画像の優先言語</label>
+            <select id="setting-card-language" class="form-select">
+              <option value="ja" selected>🇯🇵 日本語優先（存在しないカードは英語に自動フォールバック）</option>
+              <option value="en">🇺🇸 英語のみ</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-free-mulligan">無料マリガン設定 (初期手札ルール)</label>
+            <select id="setting-free-mulligan" class="form-select">
+              <option value="auto">フォーマット標準に自動準拠 (統率者/ブロールは1回無料)</option>
+              <option value="always">常に1回目のマリガン無料</option>
+              <option value="never">無料マリガンなし (通常の競技ルール)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-initial-hand-size">初期手札枚数（カスタムルール）</label>
+            <input type="number" id="setting-initial-hand-size" class="form-control" value="7" min="3" max="10">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-land-screw-threshold">土地不足（スクリュー）判定基準</label>
+            <select id="setting-land-screw-threshold" class="form-select">
+              <option value="0">0枚のみ</option>
+              <option value="1" selected>1枚以下</option>
+              <option value="2">2枚以下</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="setting-land-flood-threshold">土地過多（フラッド）判定基準</label>
+            <select id="setting-land-flood-threshold" class="form-select">
+              <option value="5" selected>5枚以上</option>
+              <option value="6">6枚以上</option>
+            </select>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1.5rem;">
+            <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">💾 データのバックアップ & 復元</h3>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary" id="btn-export-backup-json">JSONバックアップをダウンロード</button>
+              <button type="button" class="btn btn-secondary" id="btn-import-backup-json">JSONバックアップから復元</button>
+              <input type="file" id="backup-file-input" accept=".json" style="display: none;">
+              <button type="button" class="btn btn-danger" id="btn-reset-all-data">全データを初期化</button>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 1.25rem; margin-top: 1.5rem; font-size: 0.8rem; color: var(--text-muted); line-height: 1.6;">
+            <p><strong>著作権・クレジット表記:</strong></p>
+            <p>
+              本ツール「Mulligan Lab」はファンコンテンツ・ポリシーに沿った非公式のファンツールです。マジック：ザ・ギャザリングの商標および画像・テキスト等の知的財産権は Wizards of the Coast LLC に帰属します。
+            </p>
+            <p>
+              カードデータおよび画像は Scryfall API を利用して取得しています。Scryfall に過度な負荷をかけないよう、キャッシュ処理および適切なリクエストキューを実装しています。
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===================================================================
+       MODALS
+       =================================================================== -->
+  <!-- Card Detail / Zoom Modal -->
+  <div class="modal-backdrop" id="modal-card-zoom" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="zoom-card-name">カード詳細</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-card-zoom">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="card-zoom-layout">
+          <div>
+            <img id="zoom-card-image" class="card-zoom-img" src="assets/images/card-back.svg" alt="Card Artwork">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-zoom-flip-face" style="display: none; width: 100%; margin-top: 0.5rem;">🔄 裏面を表示</button>
+          </div>
+          <div class="card-zoom-details">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                <h4 id="zoom-card-title-en" style="font-size: 1.1rem;">-</h4>
+                <span id="zoom-card-mana" style="font-family: monospace; font-weight: 700;">-</span>
+              </div>
+              <div id="zoom-card-type" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">-</div>
+            </div>
+            <div id="zoom-card-oracle" style="background: var(--bg-secondary); padding: 0.75rem; border-radius: var(--radius-md); font-size: 0.85rem; white-space: pre-wrap; line-height: 1.5;"></div>
+            <div id="zoom-card-stats" style="font-size: 0.85rem; color: var(--text-secondary);"></div>
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.3rem;">設定タグ:</div>
+              <div id="zoom-card-tags" style="display: flex; flex-wrap: wrap; gap: 0.3rem;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fix Unparsed Lines Modal -->
+  <div class="modal-backdrop" id="modal-fix-unparsed" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">未認識カードの手動修正</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-fix-unparsed">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          解析できなかった行に対して、正しいカード名を入力して検索・登録できます。
+        </p>
+        <div id="unparsed-fix-rows-container"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-apply-fixed-unparsed">修正を反映</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Custom Tag Modal -->
+  <div class="modal-backdrop" id="modal-create-tag" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">カスタムタグの作成</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-create-tag">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="custom-tag-name-input">タグ名</label>
+          <input type="text" id="custom-tag-name-input" class="form-control" placeholder="例: カウンター構え">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="custom-tag-color-input">タグの色</label>
+          <input type="color" id="custom-tag-color-input" class="form-control" value="#6366f1" style="height: 42px; padding: 4px;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-create-tag">キャンセル</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-create-tag">作成</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Detail / Review Modal -->
+  <div class="modal-backdrop" id="modal-history-detail" role="dialog" aria-modal="true">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3 class="modal-title">トレーニング記録詳細 & 復習</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-history-detail">&times;</button>
+      </div>
+      <div class="modal-body" id="history-detail-body">
+        <!-- Dynamically rendered past hand state -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="btn-load-review-session">この手札を再トレーニング (復習)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Condition Presets Modal -->
+  <div class="modal-backdrop" id="modal-condition-presets" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">キープ条件プリセット管理</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-condition-presets">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <input type="text" id="preset-new-name-input" class="form-control" placeholder="新規プリセット名 (例: モダン・アグロ用基準)">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-save-as-new-preset">現在の条件を保存</button>
+        </div>
+        <div id="presets-list-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/storage.js"></script>
+  <script src="js/scryfall.js"></script>
+  <script src="js/deck-parser.js"></script>
+  <script src="js/deck-manager.js"></script>
+  <script src="js/mulligan.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/training.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
