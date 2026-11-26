@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#0f172a" />
+  <!-- Two overlapping cards -->
+  <rect x="12" y="14" width="26" height="36" rx="4" fill="#1e293b" stroke="#38bdf8" stroke-width="2" transform="rotate(-12 25 32)" />
+  <rect x="26" y="14" width="26" height="36" rx="4" fill="#1e293b" stroke="#818cf8" stroke-width="2" transform="rotate(8 39 32)" />
+  <!-- Shuffle / cycle arrows -->
+  <circle cx="32" cy="32" r="11" fill="#0f172a" stroke="url(#favGrad)" stroke-width="2.5" />
+  <path d="M 32 24 A 8 8 0 0 1 40 32 L 43 29 M 40 32 L 43 35" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M 32 40 A 8 8 0 0 1 24 32 L 21 35 M 24 32 L 21 29" fill="none" stroke="#818cf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

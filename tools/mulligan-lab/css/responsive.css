@@ -1,0 +1,191 @@
+/* ==========================================================================
+   Mulligan Lab - Responsive Styles
+   Tablets, Smartphones, Touch Targets, Print Mode
+   ========================================================================== */
+
+/* Tablet & Smaller Desktop (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .header-inner {
+    padding: 0.75rem 1rem;
+  }
+  
+  .deck-view-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .training-insights {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .card-zoom-layout {
+    grid-template-columns: 220px 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Mobile Devices (max-width: 768px) */
+@media (max-width: 768px) {
+  .header-inner {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .brand-section {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .active-deck-name {
+    max-width: 140px;
+  }
+
+  .app-main {
+    padding: 1rem 0.75rem;
+  }
+
+  .panel {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  /* Nav Tabs */
+  .nav-tabs {
+    padding: 0 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .nav-tab-btn {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .nav-tab-btn span {
+    font-size: 0.8rem;
+  }
+
+  /* Training Mode Responsive Hand */
+  .training-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .training-info-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-pill {
+    background: var(--bg-card);
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+  }
+
+  .training-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .training-actions .btn {
+    width: 100%;
+    min-height: 44px; /* Touch target */
+  }
+
+  .hand-area-wrapper {
+    padding: 0.75rem;
+    min-height: 320px;
+  }
+
+  .hand-cards-grid {
+    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  }
+
+  .mtg-card-wrapper {
+    width: 100%;
+    min-width: 100px;
+  }
+
+  /* Analysis */
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Card Zoom Modal */
+  .card-zoom-layout {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .card-zoom-img {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .modal-content {
+    max-height: 95vh;
+    border-radius: var(--radius-lg);
+  }
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: 1rem;
+  }
+
+  /* Form Elements */
+  .form-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .condition-rule-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .condition-rule-row > * {
+    width: 100%;
+  }
+}
+
+/* Touch Friendly Targets */
+@media (pointer: coarse) {
+  .btn, .form-control, .form-select, .tag-chip.clickable, .reason-chip {
+    min-height: 40px;
+  }
+  
+  .card-overlay-actions {
+    opacity: 1; /* Always show zoom button on touch */
+  }
+}
+
+/* Print Stylesheet */
+@media print {
+  .app-header, .app-nav, .training-actions, .btn, .modal-backdrop {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .panel, .chart-card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}

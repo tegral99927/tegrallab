@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080c14" />
+      <stop offset="50%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#818cf8" />
+      <stop offset="100%" stop-color="#38bdf8" />
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)" />
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.08" stroke="#38bdf8" stroke-width="1">
+    <line x1="0" y1="100" x2="1200" y2="100" />
+    <line x1="0" y1="200" x2="1200" y2="200" />
+    <line x1="0" y1="300" x2="1200" y2="300" />
+    <line x1="0" y1="400" x2="1200" y2="400" />
+    <line x1="0" y1="500" x2="1200" y2="500" />
+    <line x1="200" y1="0" x2="200" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="600" y1="0" x2="600" y2="630" />
+    <line x1="800" y1="0" x2="800" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+  </g>
+
+  <!-- Glowing background orbs -->
+  <circle cx="950" cy="220" r="240" fill="#4f46e5" opacity="0.25" filter="url(#glow)" />
+  <circle cx="1050" cy="420" r="200" fill="#06b6d4" opacity="0.2" filter="url(#glow)" />
+
+  <!-- Left Side: App Branding & Info -->
+  <g transform="translate(100, 120)">
+    <!-- Site Badge -->
+    <rect width="140" height="34" rx="17" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5" />
+    <text x="70" y="22" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="700" fill="#38bdf8" text-anchor="middle" letter-spacing="1">TEGRAL LAB</text>
+
+    <!-- Main Title -->
+    <text x="0" y="110" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="68" font-weight="900" fill="url(#titleGrad)" letter-spacing="-1">Mulligan Lab</text>
+
+    <!-- Subtitle Japanese -->
+    <text x="0" y="170" font-family="-apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif" font-size="28" font-weight="700" fill="#f8fafc">
+      MTG 初期手札・ロンドンマリガン分析ツール
+    </text>
+
+    <!-- Feature Description -->
+    <text x="0" y="225" font-family="-apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif" font-size="18" fill="#94a3b8">
+      デッキリストをインポートし、実カード画像でマリガン判断をトレーニング。
+    </text>
+    <text x="0" y="255" font-family="-apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif" font-size="18" fill="#94a3b8">
+      超幾何分布の理論値 × 最大10万回の高速モンテカルロシミュレーション。
+    </text>
+
+    <!-- Feature Tags -->
+    <g transform="translate(0, 310)">
+      <!-- Tag 1 -->
+      <rect width="170" height="42" rx="8" fill="rgba(99, 102, 241, 0.2)" stroke="#6366f1" stroke-width="1.5" />
+      <text x="85" y="26" font-family="sans-serif" font-size="15" font-weight="700" fill="#a5b4fc" text-anchor="middle">🎯 ロンドンマリガン</text>
+
+      <!-- Tag 2 -->
+      <rect x="185" width="160" height="42" rx="8" fill="rgba(6, 182, 212, 0.2)" stroke="#06b6d4" stroke-width="1.5" />
+      <text x="265" y="26" font-family="sans-serif" font-size="15" font-weight="700" fill="#67e8f9" text-anchor="middle">📊 超幾何分布理論値</text>
+
+      <!-- Tag 3 -->
+      <rect x="360" width="165" height="42" rx="8" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5" />
+      <text x="442" y="26" font-family="sans-serif" font-size="15" font-weight="700" fill="#6ee7b7" text-anchor="middle">⚙️ キープ条件設定</text>
+    </g>
+  </g>
+
+  <!-- Right Side: Visual Overlapping Magic Cards -->
+  <g transform="translate(820, 160)">
+    <!-- Card 1 (Back left) -->
+    <g transform="rotate(-15, 100, 140)">
+      <rect width="180" height="250" rx="12" fill="url(#cardGrad1)" stroke="#334155" stroke-width="3" filter="url(#glow)" />
+      <rect x="10" y="10" width="160" height="230" rx="8" fill="#182236" />
+      <circle cx="90" cy="110" r="35" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+      <text x="90" y="116" font-family="sans-serif" font-size="20" font-weight="bold" fill="#38bdf8" text-anchor="middle">7</text>
+      <text x="90" y="180" font-family="sans-serif" font-size="13" font-weight="bold" fill="#94a3b8" text-anchor="middle">KEEP HAND</text>
+    </g>
+
+    <!-- Card 2 (Front right) -->
+    <g transform="rotate(10, 140, 160)">
+      <rect width="180" height="250" rx="12" fill="url(#cardGrad1)" stroke="#6366f1" stroke-width="3" filter="url(#glow)" />
+      <rect x="10" y="10" width="160" height="230" rx="8" fill="#182236" />
+      <path d="M 60 90 L 120 90 L 90 140 Z" fill="#6366f1" opacity="0.8" />
+      <text x="90" y="180" font-family="sans-serif" font-size="14" font-weight="bold" fill="#a5b4fc" text-anchor="middle">MULLIGAN</text>
+      <!-- Bottom order chip -->
+      <rect x="30" y="200" width="120" height="26" rx="6" fill="#ef4444" />
+      <text x="90" y="218" font-family="sans-serif" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">BOTTOM 1</text>
+    </g>
+  </g>
+</svg>
