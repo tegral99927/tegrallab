@@ -1,0 +1,50 @@
+/* responsive.css - Responsive adjustments for tablets and mobile */
+
+@media (max-width: 900px) {
+  .simulator-layout {
+    height: auto;
+    min-height: calc(100vh - 52px);
+    overflow: visible;
+  }
+
+  .middle-split {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .middle-left-pane {
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .middle-right-pane {
+    height: 250px;
+  }
+
+  :root {
+    --card-width: 90px;
+    --card-height: 126px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 0 8px;
+  }
+
+  .header-title {
+    font-size: 15px;
+  }
+
+  :root {
+    --card-width: 76px;
+    --card-height: 106px;
+  }
+
+  .bottom-toolbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px;
+    gap: 6px;
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "moma",
+  "name": "MoMa (Academy 1998)",
+  "nameJa": "MoMa（トレイリアのアカデミー型 1998）",
+  "format": "Standard / Extended (1998)",
+  "year": 1998,
+  "source": "1998年 USG期 エリック・ラウアー開発 / プロツアー・シカゴ98 等のMoMaリスト",
+  "description": "1998年『ウルザズ・サーガ』発売直後に環境を席巻した史上最凶のコンボデッキ。《トレイリアのアカデミー》と軽量アーティファクトで大量マナを生み出し、《精神力》で土地を連続アンタップ。《時のらせん》や《意外な授かり物》でリソースを回復しながら、最後は相手を《天才のひらめき》で強制ドローさせてライブラリーアウトさせます。",
+  "keyCards": [
+    "Tolarian Academy",
+    "Mind Over Matter",
+    "Time Spiral",
+    "Stroke of Genius"
+  ],
+  "mainboard": [
+    { "name": "Tolarian Academy", "count": 4 },
+    { "name": "Ancient Tomb", "count": 3 },
+    { "name": "Island", "count": 10 },
+    { "name": "Lotus Petal", "count": 4 },
+    { "name": "Mana Vault", "count": 4 },
+    { "name": "Mox Diamond", "count": 4 },
+    { "name": "Voltaic Key", "count": 4 },
+    { "name": "Mind Over Matter", "count": 4 },
+    { "name": "Time Spiral", "count": 4 },
+    { "name": "Windfall", "count": 4 },
+    { "name": "Stroke of Genius", "count": 4 },
+    { "name": "Turnabout", "count": 4 },
+    { "name": "Intuition", "count": 4 },
+    { "name": "Scroll Rack", "count": 3 }
+  ],
+  "sideboard": [
+    { "name": "Stroke of Genius", "count": 1 },
+    { "name": "Turnabout", "count": 1 },
+    { "name": "Island", "count": 4 },
+    { "name": "Mana Vault", "count": 1 }
+  ]
+}

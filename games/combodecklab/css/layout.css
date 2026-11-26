@@ -1,0 +1,146 @@
+/* layout.css - General layout and grid structure */
+
+.header {
+  height: 52px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  user-select: none;
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.header-badge {
+  font-size: 11px;
+  background: var(--bg-surface);
+  color: var(--accent-gold);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Simulator Grid Layout */
+.simulator-layout {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+}
+
+.opponent-bar {
+  background: #14171d;
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  min-height: 40px;
+}
+
+.battlefield-zone {
+  flex: 1;
+  background: radial-gradient(circle at center, #181d26 0%, #101318 100%);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  overflow-y: auto;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.middle-split {
+  height: 260px;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-dark);
+}
+
+.middle-left-pane {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.mana-info-bar {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hand-zone {
+  flex: 1;
+  background: #12151b;
+  padding: 8px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.middle-right-pane {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+.stack-zone {
+  height: 110px;
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px;
+  overflow-y: auto;
+  background: #161a22;
+}
+
+.log-zone {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.bottom-toolbar {
+  height: 48px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  user-select: none;
+}

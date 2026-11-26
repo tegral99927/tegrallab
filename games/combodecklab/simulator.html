@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combo Deck Lab - シミュレーター</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/simulator.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <a href="index.html" class="header-title">⚗️ Combo Deck Lab</a>
+      <!-- Deck Switcher Dropdown -->
+      <div style="display:flex;align-items:center;gap:6px;">
+        <label for="deck-select" style="font-size:12px;color:var(--text-muted);">デッキ:</label>
+        <select id="deck-select" style="background:#161a22;color:#fff;border:1px solid var(--border-color);border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer;">
+          <!-- Populated by simulator.js -->
+        </select>
+      </div>
+      <span class="header-badge" id="mode-badge" style="background:#2a303d;color:#58a6ff;">一人回しモード</span>
+    </div>
+    <div class="header-actions">
+      <span style="font-size:12px;color:var(--text-muted);" id="seed-display">Seed: -</span>
+      <button class="btn-outline" id="btn-copy-seed" title="乱数シード値をコピー">📋 シードコピー</button>
+      <button class="btn-outline" id="btn-scenario-info" style="display:none;" title="シナリオ目標とヒント">🎯 シナリオ詳細</button>
+      <button class="btn-outline" id="btn-practice-menu" style="display:none;" title="フリープラクティス操作">🛠 フリー操作</button>
+      <button class="btn-outline" id="btn-restart" title="ゲームをリセット">🔄 リセット</button>
+      <a href="index.html"><button class="btn-outline">デッキ選択に戻る</button></a>
+    </div>
+  </header>
+
+  <!-- Simulator Main Layout -->
+  <div class="simulator-layout">
+    <!-- Opponent Bar -->
+    <div class="opponent-bar">
+      <div id="opp-stats">対戦相手ライフ: 20 | 手札: 7 | ライブラリー: 53 | 墓地: 0</div>
+      <div style="font-size:11px;color:var(--text-muted);">対戦相手: 一人回し用（妨害なし）</div>
+    </div>
+
+    <!-- Battlefield Zone -->
+    <div class="battlefield-zone" id="battlefield-container">
+      <!-- Permanents rendered here -->
+    </div>
+
+    <!-- Middle Split (Left: Mana & Hand, Right: Stack & Log) -->
+    <div class="middle-split">
+      <div class="middle-left-pane">
+        <!-- Mana Pool & Turn Info Bar -->
+        <div class="mana-info-bar">
+          <div class="pool-container" id="mana-pool-container">
+            <!-- W U B R G C -->
+          </div>
+          <div class="turn-step-badge" id="turn-badge">ターン 1 | メインフェイズ 1</div>
+        </div>
+
+        <!-- Hand Zone -->
+        <div class="hand-zone" id="hand-container">
+          <!-- Hand cards rendered here -->
+        </div>
+      </div>
+
+      <div class="middle-right-pane">
+        <!-- Stack Zone -->
+        <div class="stack-zone">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-size:11px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">スタック</span>
+            <button class="btn-outline" id="btn-resolve-stack" style="padding:2px 8px;font-size:11px;" disabled>先頭を解決</button>
+          </div>
+          <div id="stack-items-container">
+            <div style="color:var(--text-muted);font-size:12px;padding:4px;">スタックは空です</div>
+          </div>
+        </div>
+
+        <!-- Log Zone -->
+        <div style="background:#161a22;padding:4px 8px;border-bottom:1px solid var(--border-color);display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;font-weight:bold;color:var(--text-muted);text-transform:uppercase;">ゲームログ</span>
+          <div style="display:flex;gap:4px;">
+            <button class="btn-outline" id="btn-copy-log" style="padding:2px 6px;font-size:10px;">コピー</button>
+            <button class="btn-outline" id="btn-export-log" style="padding:2px 6px;font-size:10px;">保存</button>
+          </div>
+        </div>
+        <div class="log-zone" id="game-log-container"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Toolbar -->
+    <div class="bottom-toolbar">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-outline" id="btn-view-graveyard">🪦 墓地 (<span id="count-graveyard">0</span>)</button>
+        <button class="btn-outline" id="btn-view-exile">🌀 追放 (<span id="count-exile">0</span>)</button>
+        <button class="btn-outline" id="btn-view-sideboard">💼 サイドボード (<span id="count-sideboard">0</span>)</button>
+        <button class="btn-outline" id="btn-view-library">📚 ライブラリー (<span id="count-library">0</span>)</button>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;" id="mulligan-toolbar">
+        <button class="btn-outline" id="btn-mulligan">ロンドン・マリガン</button>
+        <button class="btn-primary" id="btn-keep">キープ</button>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn-outline" id="btn-undo" title="直前の操作を取り消す">↩ Undo</button>
+        <button class="btn-outline" id="btn-redo" title="取り消した操作をやり直す">↪ Redo</button>
+        <button class="btn-primary" id="btn-pass-turn">ターン終了 ❯</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/simulator.js"></script>
+</body>
+</html>

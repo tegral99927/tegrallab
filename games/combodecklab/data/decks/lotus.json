@@ -1,0 +1,48 @@
+{
+  "id": "lotus",
+  "name": "Lotus Field Combo (Pioneer)",
+  "nameJa": "ロータス・フィールド・コンボ（パイオニア）",
+  "format": "Pioneer",
+  "year": 2023,
+  "source": "パイオニア競技シーン標準構成（Raul Dares等）",
+  "description": "《睡蓮の原野》を設置し、《演劇の舞台》でコピーして3マナ出る土地を量産。《見えざる糸》や《ページへの没頭》、サイクリングした《砂時計の侍臣》で土地をアンタップして爆発的にマナを伸ばします。《出現の根本原理》から《全知》《深淵への覗き込み》を唱え、最終的に《副陽の接近》を2回唱えて特殊勝利を狙います。",
+  "keyCards": [
+    "Lotus Field",
+    "Thespian's Stage",
+    "Hidden Strings",
+    "Emergent Ultimatum",
+    "Approach of the Second Sun"
+  ],
+  "mainboard": [
+    { "name": "Lotus Field", "count": 4 },
+    { "name": "Thespian's Stage", "count": 4 },
+    { "name": "Yavimaya Coast", "count": 4 },
+    { "name": "Botanical Sanctum", "count": 4 },
+    { "name": "Mana Confluence", "count": 2 },
+    { "name": "Boseiju, Who Endures", "count": 1 },
+    { "name": "Forest", "count": 1 },
+    { "name": "Island", "count": 1 },
+    { "name": "Arboreal Grazer", "count": 4 },
+    { "name": "Vizier of Tumbling Sands", "count": 4 },
+    { "name": "Hidden Strings", "count": 4 },
+    { "name": "Pore Over the Pages", "count": 4 },
+    { "name": "Sylvan Scrying", "count": 4 },
+    { "name": "Emergent Ultimatum", "count": 4 },
+    { "name": "Omniscience", "count": 1 },
+    { "name": "Dark Petition", "count": 1 },
+    { "name": "Mastermind's Acquisition", "count": 1 },
+    { "name": "Peer into the Abyss", "count": 1 },
+    { "name": "Approach of the Second Sun", "count": 1 },
+    { "name": "Bala Ged Recovery // Bala Ged Sanctuary", "count": 1 },
+    { "name": "Lier, Disciple of the Drowned", "count": 1 },
+    { "name": "Impulse", "count": 4 }
+  ],
+  "sideboard": [
+    { "name": "Approach of the Second Sun", "count": 1 },
+    { "name": "Peer into the Abyss", "count": 1 },
+    { "name": "Omniscience", "count": 1 },
+    { "name": "Dark Petition", "count": 1 },
+    { "name": "Mastermind's Acquisition", "count": 1 },
+    { "name": "Bala Ged Recovery // Bala Ged Sanctuary", "count": 1 }
+  ]
+}
