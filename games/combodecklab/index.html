@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combo Deck Lab - MTG 一人回し・コンボ研究シミュレーター</title>
+  <meta name="description" content="Magic: The Gathering（MTG）のコンボデッキに特化した一人回し・コンボ練習・研究用シミュレーター。MoMa、ロータスコンボを完全決定論的JavaScriptで一人回し。">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    .hero {
+      text-align: center;
+      padding: 44px 20px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-title {
+      font-size: 34px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 24px;
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 20px 40px;
+    }
+    .deck-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .deck-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+    .deck-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .deck-name {
+      font-size: 21px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .deck-format-badge {
+      font-size: 11px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 3px 10px;
+      border-radius: 12px;
+      color: var(--accent-gold);
+      font-weight: 600;
+    }
+    .deck-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .key-cards-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .key-card-thumb {
+      width: 72px;
+      height: 100px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      object-fit: cover;
+      transition: transform 0.2s ease;
+    }
+    .key-card-thumb:hover {
+      transform: scale(1.08);
+      z-index: 5;
+    }
+    .deck-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .section-container {
+      max-width: 1040px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer {
+      background: #0b0d11;
+      border-top: 1px solid var(--border-color);
+      padding: 24px 20px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-brand">
+      <span class="header-title">⚗️ Combo Deck Lab</span>
+      <span class="header-badge">一人回し・コンボ研究室</span>
+    </div>
+    <div class="header-actions">
+      <a href="tests/index.html"><button class="btn-outline">🧪 自動テスト実行</button></a>
+      <a href="supported-cards.md" target="_blank"><button class="btn-outline">📋 実装カード一覧</button></a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1 class="hero-title">MTG コンボデッキ特化 一人回しシミュレーター</h1>
+    <p class="hero-subtitle">
+      収録されたコンボデッキを選んで、手札・マナ・スタックを厳密に管理しながら練習・研究できます。<br>
+      未実装カードによる曖昧な動作を排除し、決定論的JavaScriptエンジンによって正確に一人回しできます。
+    </p>
+  </div>
+
+  <!-- Decks Grid -->
+  <div class="section-container" style="margin-bottom:12px;">
+    <h2 class="section-title">🃏 デッキを選択して練習</h2>
+  </div>
+  <div class="deck-grid" id="deck-cards-container">
+    <!-- Static fallback cards guaranteed to be clickable immediately -->
+    <div class="deck-card" id="deck-card-moma">
+      <div>
+        <div class="deck-card-header">
+          <div>
+            <h3 class="deck-name">MoMa（トレイリアのアカデミー型 1998）</h3>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Standard / Extended (1998)</div>
+          </div>
+          <span class="deck-format-badge">Fully Supported</span>
+        </div>
+        <p class="deck-desc">
+          1998年『ウルザズ・サーガ』発売直後に環境を席巻した史上最凶のコンボデッキ。《トレイリアのアカデミー》と軽量アーティファクトで大量マナを生み出し、《精神力》で土地を連続アンタップ。《時のらせん》や《意外な授かり物》でリソースを回復しながら、最後は相手を《天才のひらめき》で強制ドローさせてライブラリーアウトさせます。
+        </p>
+        <div class="key-cards-row" id="key-cards-moma">
+          <!-- Populated by main.js with image thumbnails -->
+        </div>
+      </div>
+      <div class="deck-actions">
+        <a href="simulator.html?deck=moma&mode=goldfish"><button class="btn-primary" style="font-size:14px;padding:8px 16px;">一人回し開始 ❯</button></a>
+        <a href="simulator.html?deck=moma&mode=practice"><button class="btn-outline" style="font-size:14px;padding:8px 16px;">🛠 フリー練習</button></a>
+        <button class="btn-outline btn-view-decklist" data-id="moma">📋 リスト確認</button>
+        <button class="btn-outline btn-view-stats" data-id="moma">📊 練習統計</button>
+      </div>
+    </div>
+
+    <div class="deck-card" id="deck-card-lotus">
+      <div>
+        <div class="deck-card-header">
+          <div>
+            <h3 class="deck-name">ロータス・フィールド・コンボ（パイオニア）</h3>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Pioneer (2023)</div>
+          </div>
+          <span class="deck-format-badge">Fully Supported</span>
+        </div>
+        <p class="deck-desc">
+          《睡蓮の原野》を設置し、《演劇の舞台》でコピーして3マナ出る土地を量産。《見えざる糸》や《ページへの没頭》、サイクリングした《砂時計の侍臣》で土地をアンタップして爆発的にマナを伸ばします。《出現の根本原理》から《全知》《深淵への覗き込み》を唱え、最終的に《副陽の接近》を2回唱えて特殊勝利を狙います。
+        </p>
+        <div class="key-cards-row" id="key-cards-lotus">
+          <!-- Populated by main.js with image thumbnails -->
+        </div>
+      </div>
+      <div class="deck-actions">
+        <a href="simulator.html?deck=lotus&mode=goldfish"><button class="btn-primary" style="font-size:14px;padding:8px 16px;">一人回し開始 ❯</button></a>
+        <a href="simulator.html?deck=lotus&mode=practice"><button class="btn-outline" style="font-size:14px;padding:8px 16px;">🛠 フリー練習</button></a>
+        <button class="btn-outline btn-view-decklist" data-id="lotus">📋 リスト確認</button>
+        <button class="btn-outline btn-view-stats" data-id="lotus">📊 練習統計</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario Training Section -->
+  <div class="section-container">
+    <h2 class="section-title">🎯 シナリオトレーニング</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+      特定のコンボ局面や勝負所から開始し、マナ生成やリソース補充の手順を反復練習できます。
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:14px;" id="scenario-cards-container">
+      <!-- Populated by main.js -->
+    </div>
+  </div>
+
+  <!-- Footer Notice -->
+  <footer class="footer">
+    <p style="margin-bottom:6px;">
+      <strong>Combo Deck Lab</strong> はファンコンテンツ・ポリシーに沿った非公式のファン制作ツールです。
+    </p>
+    <p>
+      マジック：ザ・ギャザリング（Magic: The Gathering）およびその商標・カード画像等は、Wizards of the Coast LLC（Hasbro）の著作物・商標です。<br>
+      カードメタデータの取得には <a href="https://scryfall.com/" target="_blank" rel="noopener">Scryfall API</a> を利用しています。
+    </p>
+  </footer>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

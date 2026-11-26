@@ -1,0 +1,102 @@
+/* simulator.css - Simulator specific styling */
+
+.pool-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pool-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-surface);
+  padding: 2px 8px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  cursor: pointer;
+}
+.pool-item:hover {
+  border-color: var(--accent-blue);
+}
+
+.pool-val {
+  font-weight: 700;
+  min-width: 14px;
+  text-align: center;
+}
+
+.turn-step-badge {
+  background: #1f2937;
+  border: 1px solid #374151;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* Stack Card in sidebar */
+.stack-item-card {
+  background: var(--bg-surface);
+  border-left: 3px solid var(--accent-blue);
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-radius: 0 4px 4px 0;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stack-item-card.trigger {
+  border-left-color: var(--accent-gold);
+}
+
+/* Log Entries */
+.log-entry {
+  padding: 2px 0;
+  line-height: 1.4;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.log-entry.mana { color: #58a6ff; }
+.log-entry.cast { color: #7ee787; font-weight: 600; }
+.log-entry.action { color: #d2a8ff; }
+.log-entry.warning { color: #f0883e; }
+.log-entry.error { color: #f85149; }
+.log-entry.win { color: #ffd700; font-weight: bold; background: rgba(255, 215, 0, 0.1); padding: 4px; border-radius: 3px; }
+.log-time {
+  color: var(--text-muted);
+  font-size: 10px;
+  margin-right: 6px;
+}
+
+/* Battlefield rows */
+.battlefield-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.battlefield-row-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  width: 100%;
+  margin-bottom: -6px;
+}
+
+/* Target highlight */
+.card-item.target-candidate {
+  outline: 3px solid #388bfd;
+  box-shadow: 0 0 16px rgba(56, 139, 253, 0.8);
+  animation: pulse-border 1.5s infinite;
+}
+
+@keyframes pulse-border {
+  0% { outline-color: #388bfd; }
+  50% { outline-color: #79c0ff; }
+  100% { outline-color: #388bfd; }
+}

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combo Deck Lab - 自動テストランナー</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <style>
+    body {
+      padding: 30px 20px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .test-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 16px;
+    }
+    .test-suite {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .suite-header {
+      background: var(--bg-surface);
+      padding: 12px 16px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+    }
+    .test-row {
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .test-status {
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .status-pass { background: rgba(63, 185, 80, 0.2); color: var(--accent-green); }
+    .status-fail { background: rgba(248, 81, 73, 0.2); color: var(--accent-red); }
+    .summary-bar {
+      padding: 14px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-header">
+    <div>
+      <h1 style="font-size:24px;">🧪 Combo Deck Lab テストランナー</h1>
+      <div style="color:var(--text-muted);font-size:13px;margin-top:4px;">共通エンジン、個別カード効果、統合コンボシナリオの全自動検証</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn-primary" id="btn-rerun">再実行</button>
+      <a href="../index.html"><button class="btn-outline">トップへ戻る</button></a>
+    </div>
+  </div>
+
+  <div id="test-summary" class="summary-bar" style="background:#161a22;border:1px solid var(--border-color);">
+    テスト実行中...
+  </div>
+
+  <div id="test-results"></div>
+
+  <script type="module">
+    import { initCardData } from "../js/api/scryfall.js";
+    import { runEngineTests } from "./engine/engine.test.js";
+    import { runCardTests } from "./cards/cards.test.js";
+    import { runIntegrationTests } from "./scenarios/integration.test.js";
+
+    async function runAll() {
+      await initCardData();
+      const resultsContainer = document.getElementById("test-results");
+      resultsContainer.innerHTML = "";
+
+      let totalTests = 0;
+      let passedTests = 0;
+      let failedTests = 0;
+
+      function createRunner(suiteName) {
+        const suiteEl = document.createElement("div");
+        suiteEl.className = "test-suite";
+        suiteEl.innerHTML = `<div class="suite-header"><span>${suiteName}</span><span class="suite-count">0/0</span></div><div class="suite-body"></div>`;
+        resultsContainer.appendChild(suiteEl);
+
+        const body = suiteEl.querySelector(".suite-body");
+        const countEl = suiteEl.querySelector(".suite-count");
+        let suiteTotal = 0;
+        let suitePass = 0;
+
+        function record(ok, description, errorMsg = "") {
+          totalTests++;
+          suiteTotal++;
+          if (ok) {
+            passedTests++;
+            suitePass++;
+          } else {
+            failedTests++;
+          }
+
+          const row = document.createElement("div");
+          row.className = "test-row";
+          row.innerHTML = `
+            <span class="test-status ${ok ? "status-pass" : "status-fail"}">${ok ? "PASS" : "FAIL"}</span>
+            <span style="flex:1;">${description}</span>
+            ${errorMsg ? `<span style="color:var(--accent-red);font-size:11px;">${errorMsg}</span>` : ""}
+          `;
+          body.appendChild(row);
+          countEl.textContent = `${suitePass}/${suiteTotal}`;
+        }
+
+        return {
+          ok(val, desc) { record(Boolean(val), desc, val ? "" : "Expected truthy"); },
+          notOk(val, desc) { record(!val, desc, !val ? "" : "Expected falsy"); },
+          equal(a, b, desc) { record(a === b, desc, a === b ? "" : `Expected ${b}, got ${a}`); },
+          notEqual(a, b, desc) { record(a !== b, desc, a !== b ? "" : `Expected different values`); },
+          deepEqual(a, b, desc) {
+            const match = JSON.stringify(a) === JSON.stringify(b);
+            record(match, desc, match ? "" : `Deep equal mismatch`);
+          },
+          notDeepEqual(a, b, desc) {
+            const match = JSON.stringify(a) === JSON.stringify(b);
+            record(!match, desc, !match ? "" : `Expected different structures`);
+          }
+        };
+      }
+
+      // Run suites
+      try {
+        const engineAssert = createRunner("1. 共通ゲームエンジン・ルール テストスイート");
+        runEngineTests(engineAssert);
+
+        const cardAssert = createRunner("2. 個別カード機能・例外処理 テストスイート");
+        runCardTests(cardAssert);
+
+        const intAssert = createRunner("3. MoMa & Lotus Field コンボ成立 統合テストスイート");
+        runIntegrationTests(intAssert);
+
+        // Update summary
+        const summary = document.getElementById("test-summary");
+        if (failedTests === 0) {
+          summary.style.background = "rgba(63, 185, 80, 0.15)";
+          summary.style.borderColor = "var(--accent-green)";
+          summary.style.color = "var(--accent-green)";
+          summary.textContent = `✅ すべてのテストに合格しました！ (${passedTests}/${totalTests} テスト成功)`;
+        } else {
+          summary.style.background = "rgba(248, 81, 73, 0.15)";
+          summary.style.borderColor = "var(--accent-red)";
+          summary.style.color = "var(--accent-red)";
+          summary.textContent = `❌ ${failedTests} 件のテストが失敗しました (${passedTests}/${totalTests} 成功)`;
+        }
+      } catch (err) {
+        console.error("Test runner error:", err);
+      }
+    }
+
+    document.getElementById("btn-rerun").onclick = runAll;
+    runAll();
+  </script>
+</body>
+</html>
